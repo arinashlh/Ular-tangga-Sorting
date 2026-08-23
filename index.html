@@ -20,7 +20,6 @@
         }
         * { box-sizing: border-box; }
         
-        /* KEMBALI KE LAYAR TETAP (TANPA SCROLL) */
         body {
             margin: 0; padding: 20px 30px; background-color: var(--bg-color);
             background-image: linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px),
@@ -53,12 +52,15 @@
         /* --- MAIN LAYOUT --- */
         .main-container {
             display: flex; flex-direction: row; gap: 30px; flex: 1; min-height: 0;
+            justify-content: center; /* Memastikan konten berada di tengah layar */
         }
         
         /* --- KIRI: AREA GAME --- */
+        /* PERBAIKAN: Membatasi lebar kolom kiri agar Top Bar & Papan sejajar persis */
         #left-col {
             flex: 1; display: flex; flex-direction: column; align-items: stretch; 
             gap: 20px; min-width: 0;
+            max-width: calc(100vh - 170px); /* Batas maksimal lebar disamakan dengan tinggi sisa layar */
         }
         
         /* --- TOP BAR --- */
@@ -174,15 +176,14 @@
         .lb-item p { margin: 0; font-size: 12px; color: #2980b9; font-weight: bold; }
         .lb-rank { font-size: 14px; color: #7f8c8d; font-weight: bold; width: 25px;}
 
-        /* KEMBALI KE UKURAN PAPAN YANG PAS (TIDAK MELEBIHI LAYAR) */
+        /* --- PAPAN PERMAINAN --- */
         #board-wrapper {
             position: relative; 
-            width: 100%; 
-            max-width: calc(100vh - 170px); /* Batas maksimal tinggi layar agar tidak perlu di-scroll */
+            width: 100%; /* Akan 100% mengikuti batas lebar kolom kiri */
             aspect-ratio: 1 / 1; 
             border: 8px solid var(--border-dark); border-radius: 8px;
             box-shadow: 8px 8px 0px rgba(0,0,0,0.15); background: white; 
-            margin: 0 auto; /* Posisi di tengah sisa ruang horizontal */
+            margin: 0; 
         }
         #board {
             width: 100%; height: 100%; display: grid; 
@@ -268,8 +269,8 @@
         @media (max-width: 1024px) {
             .main-container { flex-direction: column; overflow-y: auto; }
             #left-col, #right-col { width: 100%; flex: none; max-width: 100%; height: auto;}
-            #board-wrapper { max-width: 90vw; max-height: 90vw; }
-            body { height: auto; overflow: auto;}
+            #board-wrapper { max-width: 90vw; max-height: 90vw; margin: 0 auto; }
+            body { height: auto; overflow: auto; }
         }
         @media (max-width: 768px) {
             .top-bar { flex-direction: column; align-items: stretch; gap: 15px;}
@@ -319,22 +320,24 @@
             <button class="btn pixel-text" onclick="joinGame()" style="width: 100%;">MASUK ARENA</button>
         </div>
 
-        <div id="play-section" class="panel-section" style="display: none;">
-            <div class="player-card">
-                <div class="avatar-box" id="my-avatar">🦊</div>
-                <div class="player-info">
-                    <h3 class="pixel-text" id="my-name">NAMA</h3>
-                    <p>Posisi: <b id="current-pos">1</b>/100</p>
+        <div id="play-section" style="display: none;">
+            <div class="panel-section">
+                <div class="player-card">
+                    <div class="avatar-box" id="my-avatar">🦊</div>
+                    <div class="player-info">
+                        <h3 class="pixel-text" id="my-name">NAMA</h3>
+                        <p>Posisi: <b id="current-pos">1</b>/100</p>
+                    </div>
                 </div>
-            </div>
 
-            <div class="dice-area">
-                <div class="dice-icon pixel-text" id="dice-result">?</div>
-                <button id="btn-roll" class="btn pixel-text" style="flex:1; background:#e74c3c; color:white;" onclick="rollDice()" disabled>
-                    TUNGGU<br>GURU
-                </button>
+                <div class="dice-area">
+                    <div class="dice-icon pixel-text" id="dice-result">?</div>
+                    <button id="btn-roll" class="btn pixel-text" style="flex:1; background:#e74c3c; color:white;" onclick="rollDice()" disabled>
+                        TUNGGU<br>GURU
+                    </button>
+                </div>
+                <p class="rules-text">Jawab benar = Maju. Jawab salah = Dadu Hangus.<br>Kotak Finish terkunci jika misi belum tuntas!</p>
             </div>
-            <p class="rules-text">Jawab benar = Maju. Jawab salah = Dadu Hangus.<br>Kotak Finish terkunci jika misi belum tuntas!</p>
         </div>
 
         <div class="panel-section" style="flex-grow: 1; border-bottom: none;">
