@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ular Tangga Sorting Algorithm</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+    
+    <!-- SCRIPT FIREBASE & TONE JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
     <style>
         :root {
             --bg-color: #d4f1f9; --border-dark: #1e272e;
@@ -14,184 +19,176 @@
             --panel-bg: #f5f6fa;
         }
         * { box-sizing: border-box; }
+        
         body {
-            margin: 0; padding: 15px 25px; background-color: var(--bg-color);
+            margin: 0; padding: 20px 30px; background-color: var(--bg-color);
             background-image: linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px),
             linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px);
             background-size: 20px 20px; font-family: 'Nunito', sans-serif; 
-            display: flex; flex-direction: column; gap: 15px; height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column; gap: 20px; 
+            min-height: 100vh; overflow-x: hidden; 
         }
 
         .pixel-text { font-family: 'Press Start 2P', cursive; }
 
         /* --- JUDUL GAME INTERAKTIF --- */
         .game-title {
-            text-align: center; margin: 0px 0 5px 0;
-            font-size: clamp(20px, 2.5vw, 32px); letter-spacing: 2px;
-            
+            text-align: center; margin: 5px 0 10px 0;
+            font-size: clamp(18px, 2.5vw, 28px); letter-spacing: 3px;
             background: linear-gradient(90deg, #e74c3c, #f1c40f, #2ecc71, #3498db, #9b59b6, #e74c3c);
             background-size: 200% auto;
             color: transparent;
             -webkit-background-clip: text;
             background-clip: text;
-            text-shadow: 3px 3px 0px rgba(30,39,46,0.15);
-            
+            text-shadow: 3px 3px 0px rgba(30,39,46,0.2);
             animation: shine 4s linear infinite, floatTitle 3s ease-in-out infinite;
         }
         @keyframes shine { to { background-position: 200% center; } }
         @keyframes floatTitle {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-4px); }
+            50% { transform: translateY(-6px); }
         }
 
         /* --- MAIN LAYOUT --- */
         .main-container {
-            display: flex; flex-direction: row; gap: 20px; flex: 1; min-height: 0;
+            display: flex; flex-direction: row; gap: 30px; flex: 1;
         }
         
         /* --- KIRI: AREA GAME --- */
         #left-col {
             flex: 1; display: flex; flex-direction: column; align-items: stretch; 
-            gap: 15px; min-width: 0; min-height: 0;
+            gap: 20px; min-width: 0;
         }
         
         /* --- TOP BAR --- */
         .top-bar {
             width: 100%; display: flex; justify-content: space-between; align-items: center; 
-            background: white; padding: 12px 20px; border-radius: 12px;
+            background: white; padding: 15px 25px; border-radius: 12px;
             border: 4px solid var(--border-dark); box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
         
-        .top-left-group { flex: 1; display: flex; align-items: center; gap: 12px; justify-content: flex-start; }
-        .top-center-group { flex: 1; display: flex; justify-content: center; align-items: center;}
-        .guru-actions { flex: 1; display: flex; gap: 10px; align-items: center; justify-content: flex-end;}
+        .top-left-group { display: flex; align-items: center; gap: 15px; }
         
         .timer-box {
-            background: #e84118; color: white; padding: 12px 18px;
-            border-radius: 8px; font-size: 18px; border: 3px solid var(--border-dark);
-            box-shadow: 4px 4px 0px var(--border-dark); display: flex; align-items: center; gap: 8px;
+            background: #e84118; color: white; padding: 10px 20px;
+            border-radius: 8px; font-size: 18px; border: 4px solid var(--border-dark);
+            box-shadow: 4px 4px 0px var(--border-dark); display: flex; align-items: center; gap: 10px;
         }
 
         .timer-controls { display: flex; gap: 8px; }
         
         .btn-mini {
-            width: 44px; height: 44px; padding: 0; display: flex; justify-content: center; align-items: center;
-            font-size: 16px; border: 3px solid var(--border-dark); box-shadow: 4px 4px 0px var(--border-dark);
+            width: 45px; height: 45px; padding: 0; display: flex; justify-content: center; align-items: center;
+            font-size: 14px; border: 4px solid var(--border-dark); box-shadow: 4px 4px 0px var(--border-dark);
             border-radius: 8px; cursor: pointer; color: var(--border-dark); transition: 0.1s;
         }
-        .btn-mini:active { transform: translate(3px, 3px); box-shadow: 0px 0px 0px var(--border-dark); }
+        .btn-mini:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
         .btn-mini.bg-green { background: #2ecc71; }
         .btn-mini.bg-yellow { background: #f1c40f; }
         .btn-mini.bg-red { background: #e74c3c; color: white;}
 
         .badge {
-            background: #f1f2f6; padding: 10px 20px; border-radius: 20px;
-            font-size: 14px; font-weight: 900; color: #57606f; white-space: nowrap; border: 3px solid #dfe4ea;
+            background: #f1f2f6; padding: 12px 18px; border-radius: 20px;
+            font-size: 13px; font-weight: 900; color: #57606f; white-space: nowrap; border: 2px solid #dfe4ea;
         }
 
+        .guru-actions { display: flex; gap: 12px; align-items: center; }
+        
         .btn-guru-inline {
-            border: 3px solid var(--border-dark); border-radius: 8px;
+            border: 4px solid var(--border-dark); border-radius: 8px;
             font-size: 10px; font-family: 'Press Start 2P', cursive;
             cursor: pointer; box-shadow: 4px 4px 0px var(--border-dark);
-            transition: all 0.1s; text-align: center; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            gap: 6px; line-height: 1.4; width: 85px; height: 65px; padding: 5px;
+            transition: all 0.1s; text-align: center; padding: 12px 18px; 
+            display: flex; align-items: center; justify-content: center; gap: 8px; line-height: 1.5;
         }
-        .btn-guru-inline:active { transform: translate(3px, 3px); box-shadow: 0px 0px 0px var(--border-dark); }
+        .btn-guru-inline:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
         .btn-guru-inline.bg-yellow { background: var(--btn-yellow); color: var(--border-dark); }
         .btn-guru-inline.bg-purple { background: var(--btn-purple); color: white; }
         .btn-guru-inline.bg-red { background: #c0392b; color: white; }
 
-        /* --- KANAN: PANEL KONTROL MURID --- */
+        /* --- KANAN: PANEL KONTROL MURID (STICKY) --- */
         #right-col {
             flex: 0 0 380px; background: var(--panel-bg);
             border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            display: flex; flex-direction: column; overflow-y: auto;
-            border: 4px solid var(--border-dark); height: 100%;
+            display: flex; flex-direction: column; 
+            border: 4px solid var(--border-dark); 
+            height: calc(100vh - 40px); position: sticky; top: 20px; 
         }
 
-        .panel-section { padding: 20px; border-bottom: 4px solid var(--border-dark); }
+        .panel-scroll-area { overflow-y: auto; flex: 1; padding: 25px; }
+        .panel-section { border-bottom: 4px solid var(--border-dark); padding-bottom: 25px; margin-bottom: 25px;}
+        .panel-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0;}
         
         .player-card {
-            background: white; border: 3px solid var(--border-dark); border-radius: 10px;
+            background: white; border: 4px solid var(--border-dark); border-radius: 10px;
             padding: 15px; display: flex; align-items: center; gap: 15px;
             box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
         }
         .avatar-box {
-            width: 60px; height: 60px; background: #dfe4ea; border-radius: 50%;
-            display: flex; justify-content: center; align-items: center; font-size: 35px;
+            width: 55px; height: 55px; background: #dfe4ea; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center; font-size: 32px;
             border: 3px solid #ced6e0;
         }
-        .player-info h3 { margin: 0 0 5px 0; font-size: 16px; color: var(--border-dark); }
-        .player-info p { margin: 0; font-size: 14px; color: #747d8c; font-weight: 900;}
+        .player-info h3 { margin: 0 0 5px 0; font-size: 15px; color: var(--border-dark); }
+        .player-info p { margin: 0; font-size: 13px; color: #747d8c; font-weight: 900;}
         .player-info b { font-size: 18px; color: #2980b9; }
 
-        .dice-area { display: flex; align-items: center; gap: 15px; margin-top: 20px; }
+        .dice-area { display: flex; align-items: center; gap: 15px; margin-top: 25px; }
         .dice-icon {
-            width: 80px; height: 80px; background: white; border: 4px solid var(--border-dark);
+            width: 70px; height: 70px; background: white; border: 4px solid var(--border-dark);
             border-radius: 10px; display: flex; justify-content: center; align-items: center;
-            font-size: 40px; box-shadow: 4px 4px 0px var(--border-dark); transition: transform 0.1s;
+            font-size: 32px; box-shadow: 4px 4px 0px var(--border-dark); transition: transform 0.1s;
         }
         
         @keyframes spinDice3D {
             0% { transform: rotate(0deg) scale(1); background-color: white; }
-            50% { transform: rotate(180deg) scale(1.1); background-color: var(--btn-yellow); }
+            50% { transform: rotate(180deg) scale(1.2); background-color: var(--btn-yellow); }
             100% { transform: rotate(360deg) scale(1); background-color: white; }
         }
-        .rolling-dice {
-            animation: spinDice3D 0.2s infinite linear !important;
-            color: var(--border-dark);
-        }
+        .rolling-dice { animation: spinDice3D 0.2s infinite linear !important; color: var(--border-dark); }
         
         .btn {
-            border: 3px solid var(--border-dark); border-radius: 8px;
-            font-size: 16px; cursor: pointer; height: 80px; display: flex;
-            align-items: center; justify-content: center; text-align: center;
+            border: 4px solid var(--border-dark); border-radius: 8px;
+            padding: 18px; font-size: 14px; cursor: pointer;
             box-shadow: 4px 4px 0px var(--border-dark); transition: all 0.1s; 
-            color: var(--border-dark); line-height: 1.4; background: var(--btn-green);
+            text-align: center; color: var(--border-dark); line-height: 1.5; background: var(--btn-green);
         }
         .btn:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
         .btn:disabled { filter: grayscale(100%); cursor: not-allowed; transform: none; box-shadow: none; opacity: 0.7;}
         
-        .rules-text { font-size: 11px; color: #57606f; font-weight: 900; margin-top: 15px; text-align: center; line-height: 1.5;}
+        .rules-text { font-size: 11px; color: #57606f; font-weight: 900; margin-top: 20px; text-align: center; line-height:1.6;}
 
         #join-section input {
-            width: 100%; padding: 15px; border: 3px solid var(--border-dark);
-            border-radius: 8px; font-size: 14px; font-weight: bold; font-family: inherit; outline: none;
+            width: 100%; padding: 18px; border: 4px solid var(--border-dark);
+            border-radius: 8px; font-size: 15px; font-weight: bold; font-family: inherit; outline: none;
         }
 
-        /* --- KLASEMEN & PAPAN --- */
         .leaderboard-header {
             background: var(--border-dark); color: white; text-align: center;
-            padding: 15px; font-size: 14px; border-radius: 8px; margin-bottom: 15px; 
-            letter-spacing: 1px; box-shadow: 4px 4px 0px rgba(0,0,0,0.15);
+            padding: 15px; font-size: 13px; border-radius: 6px; margin-bottom: 20px; letter-spacing: 1px;
         }
         .lb-item {
             border: 3px solid var(--border-dark); border-radius: 8px;
             padding: 12px 15px; display: flex; align-items: center; gap: 12px;
-            margin-bottom: 10px; background: #e3f2fd;
+            margin-bottom: 12px; background: #e3f2fd;
         }
-        .lb-item h4 { margin: 0 0 5px 0; font-size: 14px; color: var(--border-dark); line-height: 1.2;}
+        .lb-item h4 { margin: 0 0 5px 0; font-size: 13px; color: var(--border-dark); line-height: 1.3;}
         .lb-item p { margin: 0; font-size: 12px; color: #2980b9; font-weight: bold; }
-        .lb-rank { font-size: 16px; color: #7f8c8d; font-weight: bold; width: 25px;}
+        .lb-rank { font-size: 14px; color: #7f8c8d; font-weight: bold; width: 25px;}
 
-        /* Wrapper Container agar tinggi board maksimal responsif */
-        .board-container {
-            flex: 1; display: flex; justify-content: center; align-items: center;
-            width: 100%; min-height: 0; padding-bottom: 10px;
-        }
+        /* --- PAPAN RAKSASA: LEBAR 100% MENGIKUTI TOP BAR --- */
         #board-wrapper {
-            position: relative; height: 100%; max-width: 100%; aspect-ratio: 1 / 1; 
-            border: 6px solid var(--border-dark); border-radius: 8px;
-            box-shadow: 6px 6px 0px rgba(0,0,0,0.15); background: white; margin: 0 auto;
+            position: relative; width: 100%; height: auto; aspect-ratio: 1 / 1; 
+            border: 8px solid var(--border-dark); border-radius: 8px;
+            box-shadow: 8px 8px 0px rgba(0,0,0,0.15); background: white; margin: 0;
         }
         #board {
             width: 100%; height: 100%; display: grid; 
             grid-template-columns: repeat(10, 1fr); grid-template-rows: repeat(10, 1fr);
         }
         .cell {
-            border: 1px solid rgba(0,0,0,0.2); display: flex; padding: 3px; 
-            font-weight: 900; font-size: clamp(10px, 1.5vmin, 14px); position: relative; 
+            border: 1px solid rgba(0,0,0,0.3); display: flex; padding: 5px; 
+            font-weight: 900; font-size: clamp(12px, 1.8vmin, 16px); position: relative; 
         }
         .cell:nth-child(even) { background-color: #f1c40f; color: black; }
         .cell:nth-child(odd) { background-color: #e74c3c; color: white;}
@@ -200,18 +197,27 @@
         .cell:nth-child(7n) { background-color: #ecf0f1; color: black;}
 
         #svg-layer {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            pointer-events: none; z-index: 5;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5;
         }
 
         .player-token {
-            width: clamp(24px, 4vmin, 36px); height: clamp(24px, 4vmin, 36px);
+            width: clamp(24px, 4vmin, 38px); height: clamp(24px, 4vmin, 38px);
             position: absolute; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
             z-index: 10; transform: translate(-50%, -50%); display: flex; 
-            justify-content: center; align-items: center; font-size: clamp(14px, 2.5vmin, 22px);
+            justify-content: center; align-items: center; font-size: clamp(16px, 2.5vmin, 24px);
             background: white; border-radius: 50%; border: 3px solid var(--border-dark);
-            box-shadow: 2px 2px 0px rgba(0,0,0,0.3); pointer-events: none; 
+            box-shadow: 3px 3px 0px rgba(0,0,0,0.3); pointer-events: none; 
         }
+
+        .cell-tooltip {
+            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+            background: var(--border-dark); color: white; padding: 8px 12px; border-radius: 6px; 
+            font-family: 'Press Start 2P', cursive; font-size: 9px; white-space: nowrap; 
+            opacity: 0; visibility: hidden; transition: 0.2s; pointer-events: none; 
+            z-index: 100; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            text-align: center; line-height: 1.6;
+        }
+        .cell:hover .cell-tooltip { opacity: 1; visibility: visible; }
 
         /* --- MODAL --- */
         .modal-overlay {
@@ -219,51 +225,56 @@
             background: rgba(30,39,46,0.9); z-index: 100; justify-content: center; align-items: center;
         }
         .modal-content {
-            background: white; padding: 25px; border-radius: 12px; border: 5px solid var(--border-dark);
-            width: 90%; max-width: 500px; box-shadow: 6px 6px 0px rgba(0,0,0,0.5);
+            background: white; padding: 35px; border-radius: 12px; border: 6px solid var(--border-dark);
+            width: 90%; max-width: 550px; box-shadow: 8px 8px 0px rgba(0,0,0,0.5);
             animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); max-height: 90vh; overflow-y: auto;
         }
         .option-btn {
-            display: block; width: 100%; padding: 14px; margin: 10px 0; border: 3px solid var(--border-dark);
+            display: block; width: 100%; padding: 18px; margin: 12px 0; border: 3px solid var(--border-dark);
             background: white; cursor: pointer; text-align: left; font-family: inherit;
-            border-radius: 8px; font-weight: 900; font-size: 13px; transition: 0.1s;
+            border-radius: 8px; font-weight: 900; font-size: 15px; transition: 0.1s;
         }
-        .option-btn:hover { background: #f1f2f6; transform: translateX(4px); box-shadow: -3px 3px 0px var(--border-dark); }
+        .option-btn:hover { background: #f1f2f6; transform: translateX(5px); box-shadow: -4px 4px 0px var(--border-dark); }
         
-        .result-box { text-align: center; max-width: 400px; }
-        .result-box h2 { font-size: 18px; margin-bottom: 15px; line-height: 1.4; }
-        .result-box p { font-size: 13px; font-weight: bold; color: #57606f; line-height: 1.5; margin-bottom: 20px; }
-        .result-icon { font-size: 50px; margin-bottom: 15px; display: block; }
+        .result-box { text-align: center; max-width: 450px; }
+        .result-box h2 { font-size: 22px; margin-bottom: 20px; line-height: 1.5; }
+        .result-box p { font-size: 15px; font-weight: bold; color: #57606f; line-height: 1.6; margin-bottom: 30px; }
+        .result-icon { font-size: 60px; margin-bottom: 20px; display: block; }
         
         .pin-input {
-            width: 100%; padding: 12px; font-size: 24px; border: 3px solid var(--border-dark);
-            border-radius: 6px; margin: 15px 0; text-align: center; font-family: inherit; outline: none;
-            letter-spacing: 8px;
+            width: 100%; padding: 15px; font-size: 28px; border: 3px solid var(--border-dark);
+            border-radius: 6px; margin: 20px 0; text-align: center; font-family: inherit; outline: none;
+            letter-spacing: 10px;
         }
 
         @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         @keyframes shakeAlert {
             0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
             20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
             40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
             60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
             80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
             100% { transform: translate(1px, -2px) rotate(-1deg); }
         }
         .shake-anim { animation: shakeAlert 0.4s !important; }
 
         @media (max-width: 1024px) {
-            .main-container { flex-direction: column; overflow-y: auto; }
+            .main-container { flex-direction: column; overflow-y: visible; }
             #left-col, #right-col { width: 100%; flex: none; max-width: 100%; height: auto;}
-            #board-wrapper { max-width: 90vw; max-height: 90vw; }
-            body { height: auto; overflow: auto; }
+            #board-wrapper { max-width: 100%; height: auto; margin-bottom: 20px;}
+            #right-col { position: relative; height: auto; top: 0;}
         }
         @media (max-width: 768px) {
-            .top-bar { flex-direction: column; align-items: stretch; gap: 10px;}
-            .top-left-group, .top-center-group, .guru-actions { justify-content: center; }
-            .guru-actions { flex-wrap: wrap; }
-            .btn-guru-inline { flex: 1; min-width: 100px; height: auto; padding: 10px;}
-            .game-title { font-size: 16px; letter-spacing: 1px;}
+            .top-bar { flex-direction: column; align-items: stretch; gap: 15px;}
+            .top-left-group { justify-content: space-between; }
+            .guru-actions { flex-wrap: wrap; justify-content: center;}
+            .btn-guru-inline { flex: 1; min-width: 120px;}
+            .game-title { font-size: 14px; letter-spacing: 1px;}
         }
     </style>
 </head>
@@ -276,53 +287,38 @@
         <div class="top-bar">
             <div class="top-left-group">
                 <div class="timer-box pixel-text" id="timer-display">
-                    <span style="font-size:16px;">⏱</span> 15:00
+                    <span style="font-size:14px;">⏱</span> 15:00
                 </div>
                 <div class="timer-controls">
                     <button onclick="askPinForAction('timer_start')" title="Mulai Waktu" class="btn-mini bg-green pixel-text">▶</button>
                     <button onclick="askPinForAction('timer_pause')" title="Jeda Waktu" class="btn-mini bg-yellow pixel-text">⏸</button>
                     <button onclick="askPinForAction('timer_reset')" title="Reset Waktu" class="btn-mini bg-red pixel-text">🔄</button>
                 </div>
-            </div>
-            
-            <div class="top-center-group">
                 <span class="badge">Pemain: <b id="player-count-num" style="color:#0984e3; font-size:16px;">0/44</b></span>
             </div>
 
             <div class="guru-actions">
-                <button id="btn-music" class="btn-guru-inline bg-yellow pixel-text" onclick="toggleMusic()">
-                    <span style="font-size: 14px;">🔊</span>
-                    <span>Musik<br>ON</span>
-                </button>
-                <button onclick="askPinForAction('download_csv')" class="btn-guru-inline bg-purple pixel-text">
-                    <span style="font-size: 14px;">📥</span>
-                    <span>Unduh<br>CSV</span>
-                </button>
-                <button onclick="askPinForAction('delete_data')" class="btn-guru-inline bg-red pixel-text">
-                    <span style="font-size: 14px;">🗑️</span>
-                    <span>Hapus<br>Data</span>
-                </button>
+                <button id="btn-music" class="btn-guru-inline bg-yellow pixel-text">🔊 Musik ON</button>
+                <button onclick="askPinForAction('download_csv')" class="btn-guru-inline bg-purple pixel-text">📥 Unduh CSV</button>
+                <button onclick="askPinForAction('delete_data')" class="btn-guru-inline bg-red pixel-text">🗑️ Hapus Data</button>
             </div>
         </div>
         
-        <!-- Board Container khusus agar ukuran board merespon secara simetris -->
-        <div class="board-container">
-            <div id="board-wrapper">
-                <div id="board"></div>
-                <svg id="svg-layer" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
-            </div>
+        <div id="board-wrapper">
+            <div id="board"></div>
+            <svg id="svg-layer" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
         </div>
     </div>
 
     <div id="right-col">
-        <div id="join-section" class="panel-section">
-            <h3 class="pixel-text" style="font-size: 14px; text-align: center; margin-bottom:20px; color:#2c3e50; line-height: 1.4;">GABUNG BALAPAN!</h3>
-            <input type="text" id="player-name" placeholder="Ketik namamu di sini..." style="margin-bottom: 15px;">
-            <button class="btn pixel-text" style="width: 100%; height: auto; padding: 15px;" onclick="joinGame()">MASUK ARENA</button>
-        </div>
+        <div class="panel-scroll-area">
+            <div id="join-section" class="panel-section">
+                <h3 class="pixel-text" style="font-size: 14px; text-align: center; margin-bottom:25px; color:#2c3e50; line-height: 1.5;">GABUNG BALAPAN!</h3>
+                <input type="text" id="player-name" placeholder="Ketik namamu di sini..." style="margin-bottom: 20px;">
+                <button class="btn pixel-text" onclick="joinGame()" style="width: 100%;">MASUK ARENA</button>
+            </div>
 
-        <div id="play-section" style="display: none;">
-            <div class="panel-section">
+            <div id="play-section" class="panel-section" style="display: none;">
                 <div class="player-card">
                     <div class="avatar-box" id="my-avatar">🦊</div>
                     <div class="player-info">
@@ -339,11 +335,11 @@
                 </div>
                 <p class="rules-text">Jawab benar = Maju. Jawab salah = Dadu Hangus.<br>Kotak Finish terkunci jika misi belum tuntas!</p>
             </div>
-        </div>
 
-        <div class="panel-section" style="flex-grow: 1; border-bottom: none;">
-            <div class="leaderboard-header pixel-text">🏆 PAPAN PERINGKAT</div>
-            <div id="lb-list"></div>
+            <div class="panel-section" style="flex-grow: 1; border-bottom: none;">
+                <div class="leaderboard-header pixel-text">🏆 PAPAN PERINGKAT</div>
+                <div id="lb-list"></div>
+            </div>
         </div>
     </div>
 </div>
@@ -351,7 +347,7 @@
 <!-- Modal Soal -->
 <div id="question-modal" class="modal-overlay">
     <div class="modal-content">
-        <h3 id="q-text" style="line-height: 1.5; color:#2c3e50; margin-top:0; font-size: 16px;">Pertanyaan...</h3>
+        <h3 id="q-text" style="line-height: 1.6; color:#2c3e50; margin-top:0; font-size: 18px;">Pertanyaan...</h3>
         <div id="q-options"></div>
     </div>
 </div>
@@ -362,7 +358,7 @@
         <span class="result-icon" id="result-icon">🎯</span>
         <h2 class="pixel-text" id="result-title">HASIL</h2>
         <p id="result-desc">Deskripsi pergerakan.</p>
-        <button id="btn-result-close" class="btn pixel-text" style="width: 100%; height:auto; font-size: 14px; padding:15px;" onclick="closeResultModal()">LANJUT</button>
+        <button id="btn-result-close" class="btn pixel-text" style="width: 100%; font-size: 15px; padding:18px;" onclick="closeResultModal()">LANJUT</button>
     </div>
 </div>
 
@@ -373,14 +369,43 @@
         <h2 class="pixel-text" style="color:#2c3e50;">AKSES GURU</h2>
         <p>Masukkan PIN untuk melanjutkan tindakan:</p>
         <input type="password" id="guru-pin-input" class="pin-input" maxlength="4" placeholder="••••">
-        <div style="display:flex; gap:12px; margin-top: 10px;">
-            <button class="btn pixel-text" style="flex:1; background:#e74c3c; color:white; padding:12px; height:auto;" onclick="closePinModal()">BATAL</button>
-            <button class="btn pixel-text" style="flex:1; background:#2ecc71; padding:12px; height:auto;" onclick="verifyGuruPin()">MASUK</button>
+        <div style="display:flex; gap:15px; margin-top: 10px;">
+            <button class="btn pixel-text" style="flex:1; background:#e74c3c; color:white; padding:15px;" onclick="closePinModal()">BATAL</button>
+            <button class="btn pixel-text" style="flex:1; background:#2ecc71; padding:15px;" onclick="verifyGuruPin()">MASUK</button>
         </div>
     </div>
 </div>
 
 <script>
+    // =========================================================================
+    // 1. INISIALISASI FIREBASE
+    // =========================================================================
+    const firebaseConfig = {
+        apiKey: "AIzaSyDg0uL5NE32rLW3zUHCz0RFxR4pC_aiw_Y",
+        authDomain: "ular-tangga-kelas.firebaseapp.com",
+        projectId: "ular-tangga-kelas",
+        storageBucket: "ular-tangga-kelas.firebasestorage.app",
+        messagingSenderId: "371215021153",
+        appId: "1:371215021153:web:cfe21b5c4bb49cb9eea620",
+        measurementId: "G-RWVMMHVCK4",
+        // TAMBAHAN URL DATABASE WAJIB UNTUK SERVER ASIA (SINGAPORE)
+        databaseURL: "https://ular-tangga-kelas-default-rtdb.asia-southeast1.firebasedatabase.app" 
+        /* CATATAN: Jika ternyata map tidak muncul saat online, ubah link di atas menjadi:
+           databaseURL: "https://ular-tangga-kelas-default-rtdb.firebaseio.com" */
+    };
+
+    let db, gameRef;
+    if (firebaseConfig.apiKey) {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.database();
+        gameRef = db.ref('ularTanggaKelas');
+    } else {
+        alert("PENTING: Firebase gagal memuat.");
+    }
+
+    // =========================================================================
+    // 2. DATA PERMAINAN & BANK SOAL
+    // =========================================================================
     const bankSoal = [
         { q: "Sebuah algoritma sorting bekerja dengan mengambil satu data, kemudian memasukkannya ke posisi yang sesuai pada bagian data yang sudah terurut. Algoritma yang memiliki cara kerja tersebut adalah ...", opt: ["Bubble Sort", "Selection Sort", "Insertion Sort", "Searching"], ans: 2 },
         { q: "Algoritma yang bekerja dengan mencari nilai terkecil dari bagian data yang belum terurut kemudian menempatkannya pada posisi yang sesuai adalah ...", opt: ["Insertion Sort", "Selection Sort", "Bubble Sort", "Linear Search"], ans: 1 },
@@ -401,37 +426,60 @@
 
     const avatars = ["🦊", "🐱", "🐶", "🐼", "🐨", "🦁", "🐯", "🐸", "🐙", "🐧", "🦖", "🦄", "🐵", "🐥"];
     let myId = localStorage.getItem('sortingRaceMyId') || null; 
-    let players = JSON.parse(localStorage.getItem('sortingRaceData')) || {};
-    
+    let players = {};
     let currentDice = 0;
+    let onResultClosed = null;
     let currentActiveQuestionIndex = null;
     let pendingGuruAction = null;
-    
-    let timerData = JSON.parse(localStorage.getItem('sortingRaceTimerData')) || { remaining: 900, isRunning: false, endTime: 0 };
+    let timerData = { remaining: 900, isRunning: false, endTime: 0 };
     let timerInterval = null;
 
     let isMusicPlaying = false;
     let bgmSynth = new Tone.Synth({ oscillator: { type: "square" }, envelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.1 } }).toDestination();
+    let sfxSynth = new Tone.Synth({ oscillator: { type: "triangle" }, envelope: { attack: 0.01, decay: 0.1, sustain: 0, release: 0.1 } }).toDestination();
     let melody = new Tone.Sequence((time, note) => { bgmSynth.triggerAttackRelease(note, "16n", time); }, ["C4", "Eb4", "G4", "Bb4", "C5", "Bb4", "G4", "Eb4"], "8n");
 
     const ladders = { 2: 38, 21: 42, 33: 68, 51: 89, 71: 91 };
     const snakes = { 24: 7, 58: 36, 73: 47, 85: 64, 98: 79 };
 
-    function toggleMusic() {
-        if (!isMusicPlaying) {
-            Tone.start();
-            Tone.Transport.start();
-            melody.start(0);
-            isMusicPlaying = true;
-            document.getElementById('btn-music').innerHTML = '<span style="font-size: 14px;">🔊</span><span>Musik<br>OFF</span>';
-        } else {
-            melody.stop();
-            Tone.Transport.stop();
-            isMusicPlaying = false;
-            document.getElementById('btn-music').innerHTML = '<span style="font-size: 14px;">🔊</span><span>Musik<br>ON</span>';
-        }
+    // =========================================================================
+    // 3. SINKRONISASI DATA DENGAN FIREBASE (REAL-TIME)
+    // =========================================================================
+    if (gameRef) {
+        gameRef.child('players').on('value', (snapshot) => {
+            players = snapshot.val() || {};
+            
+            if (myId && players[myId]) {
+                document.getElementById('join-section').style.display = 'none';
+                document.getElementById('play-section').style.display = 'block';
+                document.getElementById('my-name').innerText = players[myId].name.toUpperCase();
+                document.getElementById('my-avatar').innerText = players[myId].ava;
+                document.getElementById('current-pos').innerText = players[myId].pos;
+            } else if (myId && !players[myId]) {
+                localStorage.removeItem('sortingRaceMyId');
+                location.reload();
+            }
+            updateBoard();
+        });
+
+        gameRef.child('timer').on('value', (snapshot) => {
+            let newData = snapshot.val();
+            if (newData) {
+                let wasRunning = timerData.isRunning;
+                timerData = newData;
+                if (timerData.isRunning && !wasRunning) runTimerLoop();
+                else if (!timerData.isRunning) { clearInterval(timerInterval); renderTimer(); }
+            }
+        });
     }
 
+    function saveGameState() { if(gameRef) gameRef.child('players').set(players); }
+    function saveTimerState() { if(gameRef) gameRef.child('timer').set(timerData); }
+
+
+    // =========================================================================
+    // 4. LOGIKA PERMAINAN
+    // =========================================================================
     function getCellCoord(cellNum) {
         let zeroIndex = cellNum - 1; 
         let rowFromBottom = Math.floor(zeroIndex / 10); 
@@ -453,15 +501,7 @@
         }
         board.innerHTML = html;
         drawSnakesAndLadders();
-        
-        if (myId && players[myId]) {
-            document.getElementById('join-section').style.display = 'none';
-            document.getElementById('play-section').style.display = 'block';
-            document.getElementById('my-name').innerText = players[myId].name.toUpperCase();
-            document.getElementById('my-avatar').innerText = players[myId].ava;
-            document.getElementById('current-pos').innerText = players[myId].pos;
-        }
-        updateBoard();
+        renderTimer(); 
     }
 
     function drawSnakesAndLadders() {
@@ -537,7 +577,6 @@
         } else if (action === 'download_csv') {
             let d = new Date();
             let dStr = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
-            
             let csv = "Nama,Karakter,Status,Posisi,Soal Benar,Dadu Hangus (Salah),Giliran Total,Skor Akurasi,Waktu Mulai,Waktu Selesai,Total Waktu (Detik)\n";
             
             Object.values(players).forEach(p => { 
@@ -550,223 +589,322 @@
                 if(p.startTime && p.finishTime){
                    let [sh, sm, ss] = p.startTime.split(':');
                    let [eh, em, es] = p.finishTime.split(':');
-                   let startSec = parseInt(sh)*3600 + parseInt(sm)*60 + parseInt(ss);
-                   let endSec = parseInt(eh)*3600 + parseInt(em)*60 + parseInt(es);
-                   duration = endSec - startSec;
+                   let sDate = new Date(); sDate.setHours(sh, sm, ss);
+                   let eDate = new Date(); eDate.setHours(eh, em, es);
+                   duration = Math.round((eDate - sDate)/1000);
                 }
-                csv += `"${p.name}","${p.ava}","${status}",${p.pos},${p.answered},${p.wrong},${totalGiliran},"${akurasi}%","${wMulai}","${wSelesai}","${duration}"\n`;
+                csv += `${p.name},${p.ava},${status},${p.pos},${p.answered},${p.wrong},${totalGiliran},${akurasi},${wMulai},${wSelesai},${duration}\n`; 
             });
-
-            let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            let link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `Hasil_Ular_Tangga_${dStr}.csv`;
-            link.click();
+            
+            let blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' }); 
+            let url = window.URL.createObjectURL(blob);
+            let a = document.createElement('a'); a.href = url; a.download = `Hasil_UlarTangga_Sorting_${dStr}.csv`; a.click();
         } else if (action === 'delete_data') {
-            if (confirm("Apakah Anda yakin ingin menghapus seluruh data pemain?")) {
-                localStorage.removeItem('sortingRaceData');
-                localStorage.removeItem('sortingRaceMyId');
-                players = {}; myId = null;
+            if(confirm("Yakin ingin menghapus seluruh jejak pemain di database Firebase?")) {
+                if(gameRef) gameRef.remove(); 
+                localStorage.removeItem('sortingRaceMyId'); 
                 location.reload();
             }
         }
     }
 
-    function saveTimerState() {
-        localStorage.setItem('sortingRaceTimerData', JSON.stringify(timerData));
-    }
-
     function renderTimer() {
-        let display = document.getElementById('timer-display');
-        let rem = Math.ceil(timerData.remaining);
-        let mins = Math.floor(rem / 60);
-        let secs = rem % 60;
-        display.innerHTML = `<span style="font-size:16px;">⏱</span> ${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+        let m = Math.floor(timerData.remaining / 60);
+        let s = Math.floor(timerData.remaining % 60);
+        document.getElementById('timer-display').innerHTML = `<span style="font-size:12px;">⏱</span> ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
         
-        let rollBtn = document.getElementById('btn-roll');
-        if (rollBtn) {
-            if (timerData.isRunning) {
-                rollBtn.disabled = false;
-                rollBtn.style.background = "#2ecc71";
-                rollBtn.style.color = "var(--border-dark)";
-                rollBtn.innerHTML = "LEMPAR<br>DADU";
-            } else {
-                rollBtn.disabled = true;
-                rollBtn.style.background = "#e74c3c";
-                rollBtn.style.color = "white";
-                rollBtn.innerHTML = "TUNGGU<br>GURU";
-            }
-        }
+        if (timerData.isRunning && timerData.remaining > 0) { unlockDice(); } else { lockDice(); }
     }
 
     function runTimerLoop() {
         clearInterval(timerInterval);
+        if (!timerData.isRunning) return;
         timerInterval = setInterval(() => {
-            if (timerData.isRunning) {
-                let now = Date.now();
-                timerData.remaining = Math.max(0, (timerData.endTime - now) / 1000);
-                if (timerData.remaining <= 0) {
-                    timerData.isRunning = false;
-                    clearInterval(timerInterval);
-                }
-                saveTimerState();
-                renderTimer();
+            let dist = (timerData.endTime - Date.now()) / 1000;
+            if (dist <= 0) {
+                clearInterval(timerInterval); timerData.remaining = 0; timerData.isRunning = false; renderTimer(); 
+            } else {
+                timerData.remaining = dist; renderTimer();
             }
-        }, 500);
+        }, 1000);
+    }
+
+    function lockDice() {
+        let rollBtn = document.getElementById('btn-roll');
+        if (rollBtn) {
+            rollBtn.disabled = true;
+            rollBtn.style.background = "#e74c3c"; rollBtn.style.color = "white";
+            if (timerData.remaining <= 0) rollBtn.innerHTML = "WAKTU<br>HABIS";
+            else rollBtn.innerHTML = "TUNGGU<br>GURU";
+        }
+    }
+
+    function unlockDice() {
+        let rollBtn = document.getElementById('btn-roll');
+        if (rollBtn && myId && players[myId] && !players[myId].isFinish) {
+            rollBtn.disabled = false; 
+            rollBtn.style.background = "#2ecc71"; rollBtn.style.color = "var(--border-dark)";
+            rollBtn.innerHTML = "LEMPAR<br>DADU";
+        }
+    }
+
+    function showCustomResult(icon, title, desc, btnColor, isShake, callbackParam) {
+        document.getElementById('result-icon').innerText = icon;
+        document.getElementById('result-title').innerText = title;
+        document.getElementById('result-title').style.color = (btnColor === 'var(--btn-red)') ? '#e84118' : '#2c3e50';
+        document.getElementById('result-desc').innerHTML = desc;
+        
+        const btn = document.getElementById('btn-result-close');
+        btn.style.backgroundColor = (btnColor === 'var(--btn-yellow)') ? 'var(--btn-yellow)' : btnColor;
+        btn.style.color = (btnColor === 'var(--btn-yellow)') ? 'var(--border-dark)' : 'white';
+        
+        let box = document.getElementById('result-box-content');
+        if(isShake) { box.classList.add('shake-anim'); setTimeout(() => box.classList.remove('shake-anim'), 500); }
+        
+        document.getElementById('result-modal').style.display = 'flex';
+        onResultClosed = callbackParam;
+    }
+
+    function closeResultModal() {
+        document.getElementById('result-modal').style.display = 'none';
+        if (onResultClosed) {
+            let callback = onResultClosed;
+            onResultClosed = null;
+            callback();
+        }
     }
 
     function joinGame() {
-        let nameInput = document.getElementById('player-name').value.trim();
-        if (!nameInput) return alert("Isi namamu terlebih dahulu!");
+        const name = document.getElementById('player-name').value.trim();
+        if (!name) return showCustomResult("⚠️", "HEI!", "Ketik namamu dulu sebelum bermain.", "var(--btn-red)", true, null);
+        if (!gameRef) return alert("Firebase belum dikonfigurasi. Anda tidak bisa bergabung ke server.");
         
-        myId = 'p_' + Date.now();
-        let randomAva = avatars[Math.floor(Math.random() * avatars.length)];
+        myId = 'player_' + Math.random().toString(36).substr(2, 9);
+        let myAva = avatars[Math.floor(Math.random() * avatars.length)];
+        let unansweredArr = Array.from({length: bankSoal.length}, (_, i) => i);
+        
         let now = new Date();
-        let timeStr = String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0') + ":" + String(now.getSeconds()).padStart(2, '0');
+        let joinTime = String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0') + ":" + String(now.getSeconds()).padStart(2, '0');
 
         players[myId] = {
-            id: myId, name: nameInput, ava: randomAva, pos: 1,
-            answered: 0, wrong: 0, isFinish: false, startTime: timeStr, finishTime: null
+            name: name, pos: 1, answered: 0, ava: myAva,
+            isFinish: false, correct: 0, wrong: 0, unanswered: unansweredArr,
+            startTime: joinTime, finishTime: null
         };
+        
+        localStorage.setItem('sortingRaceMyId', myId); 
+        saveGameState(); 
+    }
 
-        localStorage.setItem('sortingRaceMyId', myId);
-        localStorage.setItem('sortingRaceData', JSON.stringify(players));
-
-        document.getElementById('join-section').style.display = 'none';
-        document.getElementById('play-section').style.display = 'block';
-        document.getElementById('my-name').innerText = nameInput.toUpperCase();
-        document.getElementById('my-avatar').innerText = randomAva;
-        document.getElementById('current-pos').innerText = 1;
-
-        updateBoard();
+    function playDiceSound() {
+        if (!isMusicPlaying) return;
+        let now = Tone.now();
+        sfxSynth.triggerAttackRelease("C4", "32n", now);
+        sfxSynth.triggerAttackRelease("E4", "32n", now + 0.15);
+        sfxSynth.triggerAttackRelease("G4", "32n", now + 0.3);
+        sfxSynth.triggerAttackRelease("C5", "32n", now + 0.45);
+        sfxSynth.triggerAttackRelease("G5", "16n", now + 0.7);
     }
 
     function rollDice() {
         if (!myId || !players[myId]) return;
-        let diceBtn = document.getElementById('btn-roll');
-        let diceIcon = document.getElementById('dice-result');
-        diceBtn.disabled = true;
+        
+        if(players[myId].isFinish) {
+            return showCustomResult("🏆", "SELESAI", "Kamu sudah mencapai garis Finish!", "var(--btn-yellow)", false, null);
+        }
+        
+        let rollBtn = document.getElementById('btn-roll');
+        rollBtn.disabled = true;
+        
+        const diceIcon = document.getElementById('dice-result');
         diceIcon.classList.add('rolling-dice');
+        playDiceSound();
+
+        let rollInterval = setInterval(() => {
+            diceIcon.innerText = Math.floor(Math.random() * 6) + 1;
+        }, 50);
 
         setTimeout(() => {
+            clearInterval(rollInterval);
             diceIcon.classList.remove('rolling-dice');
             currentDice = Math.floor(Math.random() * 6) + 1;
             diceIcon.innerText = currentDice;
-            showQuestionModal();
-        }, 600);
+            setTimeout(showQuestion, 600);
+        }, 800);
     }
 
-    function showQuestionModal() {
-        currentActiveQuestionIndex = Math.floor(Math.random() * bankSoal.length);
-        let q = bankSoal[currentActiveQuestionIndex];
-        document.getElementById('q-text').innerText = q.q;
+    function showQuestion() {
+        let p = players[myId];
+        let availableQ = p.unanswered;
+        if(availableQ.length === 0) availableQ = [0]; 
+
+        let randomIdx = Math.floor(Math.random() * availableQ.length);
+        currentActiveQuestionIndex = availableQ[randomIdx];
+        const qData = bankSoal[currentActiveQuestionIndex];
         
+        document.getElementById('q-text').innerText = qData.q;
         let optHtml = '';
-        q.opt.forEach((o, idx) => {
-            optHtml += `<button class="option-btn" onclick="answerQuestion(${idx})">${String.fromCharCode(65 + idx)}. ${o}</button>`;
+        qData.opt.forEach((opt, idx) => {
+            optHtml += `<button class="option-btn" onclick="checkAnswer(${idx}, ${qData.ans})">${opt}</button>`;
         });
         document.getElementById('q-options').innerHTML = optHtml;
         document.getElementById('question-modal').style.display = 'flex';
     }
 
-    function answerQuestion(selectedIdx) {
+    function checkAnswer(selected, correct) {
         document.getElementById('question-modal').style.display = 'none';
-        let q = bankSoal[currentActiveQuestionIndex];
         let p = players[myId];
+        
+        if (selected === correct) {
+            p.unanswered = p.unanswered.filter(idx => idx !== currentActiveQuestionIndex);
+            p.answered++; p.correct++;
+            
+            if (isMusicPlaying) {
+                let now = Tone.now();
+                sfxSynth.triggerAttackRelease("C5", "16n", now);
+                sfxSynth.triggerAttackRelease("E5", "16n", now + 0.1);
+                sfxSynth.triggerAttackRelease("G5", "8n", now + 0.2);
+            }
+            
+            let msg = `Kamu melangkah maju <b>${currentDice}</b> kotak.`;
+            let newPos = p.pos + currentDice;
+            let finalTitle = "JAWABAN TEPAT!"; let icon = "🎯"; let btnColor = "var(--btn-green)";
 
-        if (selectedIdx === q.ans) {
-            p.answered = (p.answered || 0) + 1;
-            let targetPos = Math.min(100, p.pos + currentDice);
-            let resultMsg = `Jawaban BENAR! Dadu ${currentDice}, maju dari ${p.pos} ke ${targetPos}.`;
-
-            if (ladders[targetPos]) {
-                let newPos = ladders[targetPos];
-                resultMsg += ` Hore! Naik Tangga ke ${newPos}! 🪜`;
-                p.pos = newPos;
-            } else if (snakes[targetPos]) {
-                let newPos = snakes[targetPos];
-                resultMsg += ` Awas! Terpeleset Ular ke ${newPos}! 🐍`;
-                p.pos = newPos;
+            if (newPos >= 100) {
+                if (p.answered >= 15) {
+                    p.pos = 100; p.isFinish = true;
+                    let now = new Date();
+                    p.finishTime = String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0') + ":" + String(now.getSeconds()).padStart(2, '0');
+                    msg = `✨ SELAMAT! KAMU MENYELESAIKAN 15 MISI DAN FINISH! ✨`;
+                    finalTitle = "LUAR BIASA!"; icon = "🏆";
+                } else {
+                    p.pos = 99; 
+                    msg = `Posisi mentok di 99!<br>Masih ada soal yang belum lunas. Terus berjuang!`;
+                    icon = "🔒"; btnColor = "var(--btn-yellow)";
+                }
             } else {
-                p.pos = targetPos;
+                p.pos = newPos;
+                if (ladders[p.pos]) {
+                    msg += `<br><br>🚀 WOOSH! Kamu mendarat di tangga dan naik!`; p.pos = ladders[p.pos]; icon = "🚀";
+                } else if (snakes[p.pos]) {
+                    msg += `<br><br>🐍 ADUH! Digigit Ular, kamu meluncur turun!`; p.pos = snakes[p.pos]; icon = "🐍"; btnColor = "var(--btn-red)";
+                }
             }
+            
+            let executeAfterClose = () => { 
+                saveGameState(); 
+            };
+            
+            showCustomResult(icon, finalTitle, msg, btnColor, false, executeAfterClose);
 
-            if (p.pos === 100 && !p.isFinish) {
-                p.isFinish = true;
-                let now = new Date();
-                p.finishTime = String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0') + ":" + String(now.getSeconds()).padStart(2, '0');
-                resultMsg += " FEAT SELESAI! Kamu berhasil mencapai FINISH! 🏆";
-            }
-
-            showResultModal("JAWABAN BENAR!", "🎉", resultMsg);
         } else {
-            p.wrong = (p.wrong || 0) + 1;
-            showResultModal("JAWABAN SALAH!", "❌", "Jawaban kurang tepat. Dadu hangus dan kamu tidak bisa maju.");
-        }
-
-        localStorage.setItem('sortingRaceData', JSON.stringify(players));
-        document.getElementById('current-pos').innerText = p.pos;
-        updateBoard();
-    }
-
-    function showResultModal(title, icon, desc) {
-        document.getElementById('result-title').innerText = title;
-        document.getElementById('result-icon').innerText = icon;
-        document.getElementById('result-desc').innerText = desc;
-        document.getElementById('result-modal').style.display = 'flex';
-    }
-
-    function closeResultModal() {
-        document.getElementById('result-modal').style.display = 'none';
-        if (timerData.isRunning) {
-            document.getElementById('btn-roll').disabled = false;
+            p.wrong++;
+            if (navigator.vibrate) navigator.vibrate(400);
+            
+            if (isMusicPlaying) {
+                let now = Tone.now();
+                sfxSynth.triggerAttackRelease("E3", "8n", now);
+                sfxSynth.triggerAttackRelease("C3", "4n", now + 0.2);
+            }
+            
+            let executeAfterClose = () => { 
+                saveGameState(); 
+            };
+            
+            showCustomResult("❌", "YAH SALAH!", "Cara kerja algoritma kurang tepat.<br>Dadu hangus, kamu tidak bergerak giliran ini.", "var(--btn-red)", true, executeAfterClose);
         }
     }
 
     function updateBoard() {
-        document.querySelectorAll('.player-token').forEach(el => el.remove());
+        document.querySelectorAll('.player-token').forEach(t => t.remove());
+        document.querySelectorAll('.cell-tooltip').forEach(t => t.remove());
+        
+        const lbList = document.getElementById('lb-list');
+        lbList.innerHTML = '';
+        
+        let playersByPos = {};
+        let sortedPlayers = Object.values(players).sort((a, b) => b.pos - a.pos);
 
-        let pArray = Object.values(players);
-        document.getElementById('player-count-num').innerText = `${pArray.length}/44`;
-
-        pArray.forEach(p => {
-            let coord = getCellCoord(p.pos);
-            let token = document.createElement('div');
-            token.className = 'player-token';
-            token.style.left = coord.x + '%';
-            token.style.top = coord.y + '%';
-            token.innerText = p.ava;
-            token.title = `${p.name} (Posisi: ${p.pos})`;
-            document.getElementById('board-wrapper').appendChild(token);
+        sortedPlayers.forEach(p => {
+            if (!playersByPos[p.pos]) playersByPos[p.pos] = [];
+            playersByPos[p.pos].push(p);
         });
 
-        pArray.sort((a, b) => b.pos - a.pos);
-        let lbHtml = '';
-        pArray.forEach((p, rank) => {
-            lbHtml += `
+        for (let pos in playersByPos) {
+            let group = playersByPos[pos];
+            let cellCoord = getCellCoord(pos);
+            let totalInCell = group.length;
+
+            group.forEach((p, i) => {
+                const token = document.createElement('div');
+                token.className = 'player-token';
+                token.innerText = p.ava;
+
+                let offsetX = 0; let offsetY = 0;
+                
+                if (totalInCell > 1) {
+                    let angle = (i / totalInCell) * (2 * Math.PI);
+                    let radius = 2.5; 
+                    offsetX = Math.cos(angle) * radius;
+                    offsetY = Math.sin(angle) * radius;
+                    token.style.transform = `translate(-50%, -50%) scale(0.85)`;
+                }
+
+                token.style.left = (cellCoord.x + offsetX) + '%'; 
+                token.style.top = (cellCoord.y + offsetY) + '%';
+                document.getElementById('board-wrapper').appendChild(token);
+            });
+
+            if (pos > 0) {
+                let cellId = (pos % 10 === 0 && Math.floor((pos-1)/10) % 2 !== 0) ? pos : pos; 
+                let cellElem = document.getElementById(`cell-${pos}`);
+                if(cellElem) {
+                    let tooltip = document.createElement('div');
+                    tooltip.className = 'cell-tooltip';
+                    
+                    let namesToShow = group.slice(0, 3).map(p => p.name.toUpperCase()).join('<br>');
+                    if (totalInCell > 3) {
+                        namesToShow += `<br><span style="color:#f1c40f;">+ ${totalInCell - 3} lainnya</span>`;
+                    }
+                    
+                    tooltip.innerHTML = namesToShow;
+                    cellElem.appendChild(tooltip);
+                }
+            }
+        }
+
+        sortedPlayers.forEach((p, idx) => {
+            lbList.innerHTML += `
                 <div class="lb-item">
-                    <span class="lb-rank">#${rank+1}</span>
-                    <span style="font-size:24px;">${p.ava}</span>
-                    <div style="flex:1;">
-                        <h4>${p.name}</h4>
-                        <p>Posisi: ${p.pos}/100 ${p.isFinish ? '🏁' : ''}</p>
+                    <span class="lb-rank">${idx + 1}.</span>
+                    <div style="font-size:24px;">${p.ava}</div>
+                    <div style="flex-grow:1;">
+                        <h4 class="pixel-text">${p.name} ${p.isFinish ? '🏁' : ''}</h4>
+                        <p>📍 Posisi: ${p.pos}/100</p>
                     </div>
                 </div>
             `;
         });
-        document.getElementById('lb-list').innerHTML = lbHtml;
+        document.getElementById('player-count-num').innerText = `${Object.keys(players).length}/44`;
     }
 
-    window.onload = function() {
-        createBoard();
-        if (timerData.isRunning) {
-            let now = Date.now();
-            timerData.remaining = Math.max(0, (timerData.endTime - now) / 1000);
-            if (timerData.remaining > 0) runTimerLoop();
-            else timerData.isRunning = false;
+    document.getElementById('btn-music').addEventListener('click', async () => {
+        if (!isMusicPlaying) {
+            await Tone.start(); Tone.Transport.bpm.value = 160; melody.start(0); Tone.Transport.start();
+            document.getElementById('btn-music').innerHTML = "🔊 Musik ON"; isMusicPlaying = true;
+        } else {
+            melody.stop(); Tone.Transport.stop();
+            document.getElementById('btn-music').innerHTML = "🔊 Musik OFF"; isMusicPlaying = false;
         }
-        renderTimer();
-    };
+    });
+
+    document.getElementById("guru-pin-input").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault(); verifyGuruPin();
+        }
+    });
+
+    window.onload = () => { createBoard(); };
 </script>
 </body>
 </html>
