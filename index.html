@@ -26,7 +26,7 @@
             linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px);
             background-size: 20px 20px; font-family: 'Nunito', sans-serif; 
             display: flex; flex-direction: column; gap: 15px; 
-            height: 100vh; overflow: hidden; /* Default Laptop: Terkunci 1 layar */
+            height: 100vh; overflow: hidden; /* Mengunci agar laptop 1 halaman pas */
         }
 
         .pixel-text { font-family: 'Press Start 2P', cursive; }
@@ -243,22 +243,22 @@
         .shake-anim { animation: shakeAlert 0.4s !important; }
 
         /* ========================================================================= */
-        /* PERBAIKAN RESPONSIVE KHUSUS MOBILE (HP) AGAR RAPIH DAN BISA SCROLL BAWAH */
+        /* RESPONSIVE LAYOUT UNTUK HP: AGAR TIDAK MIRING DAN BISA DI-SCROLL KE BAWAH */
         /* ========================================================================= */
         @media (max-width: 1024px) {
-            .main-container { flex-direction: column; overflow-y: visible; justify-content: flex-start; align-items: center;}
-            #left-col, #right-col { width: 100%; max-width: 100%; height: auto;}
-            #board-wrapper { max-height: none; width: 100%; aspect-ratio: 1/1; margin: 0 auto; }
-            body { height: auto; overflow-y: auto; padding: 15px; } /* Membuka kunci scroll khusus HP/Tablet */
-            #right-col { margin-top: 10px; }
+            body { height: auto; overflow-y: auto; padding: 10px; } /* Membuka kunci scroll */
+            .main-container { flex-direction: column; align-items: center; }
+            #left-col, #right-col { width: 100%; max-width: 100%; height: auto; }
+            #board-wrapper { width: 100%; height: auto; aspect-ratio: 1/1; max-height: none; }
         }
 
         @media (max-width: 768px) {
-            .top-bar { flex-direction: column; align-items: stretch; gap: 15px; padding: 15px;}
-            .top-left-group { flex-direction: column; width: 100%; justify-content: center; }
-            .guru-actions { width: 100%; justify-content: space-between;}
-            .btn-guru-inline { flex: 1 1 45%; padding: 12px 10px; font-size: 10px;}
-            .game-title { font-size: 16px; letter-spacing: 1px;}
+            .top-bar { flex-direction: column; padding: 15px; gap: 15px; }
+            .top-left-group { flex-direction: column; width: 100%; justify-content: center; gap: 10px; }
+            .guru-actions { display: grid; grid-template-columns: 1fr 1fr; width: 100%; gap: 10px; }
+            .btn-guru-inline { width: 100%; padding: 12px 5px; font-size: 10px; }
+            #btn-music { grid-column: 1 / -1; } /* Tombol musik membentang di HP */
+            .game-title { font-size: 16px; }
         }
     </style>
 </head>
@@ -364,8 +364,7 @@
 
 <script>
     // =========================================================================
-    // 1. INISIALISASI FIREBASE (URL SERVER ASIA - SINGAPORE)
-    // Karena Anda di Indonesia, sangat besar kemungkinan servernya di Asia
+    // 1. INISIALISASI FIREBASE (URL SERVER ASIA DIPERBAIKI)
     // =========================================================================
     const firebaseConfig = {
         apiKey: "AIzaSyDg0uL5NE32rLW3zUHCz0RFxR4pC_aiw_Y",
@@ -375,7 +374,6 @@
         messagingSenderId: "371215021153",
         appId: "1:371215021153:web:cfe21b5c4bb49cb9eea620",
         measurementId: "G-RWVMMHVCK4",
-        // Menggunakan server Asia Tenggara. Jika masih gagal, ganti ke .firebaseio.com
         databaseURL: "https://ular-tangga-kelas-default-rtdb.asia-southeast1.firebasedatabase.app" 
     };
 
@@ -384,15 +382,6 @@
         firebase.initializeApp(firebaseConfig);
         db = firebase.database();
         gameRef = db.ref('ularTanggaKelas');
-
-        // DETEKSI KONEKSI ERROR (Akan muncul alert di layar jika server Firebase salah)
-        db.ref('.info/connected').on('value', function(snap) {
-            if (snap.val() === false) {
-                console.log("Mencoba koneksi ke Firebase...");
-            }
-        });
-    } else {
-        alert("PENTING: Firebase gagal memuat.");
     }
 
     // =========================================================================
@@ -435,11 +424,27 @@
     const snakes = { 24: 7, 58: 36, 73: 47, 85: 64, 98: 79 };
 
     // =========================================================================
-    // 3. SINKRONISASI DATA DENGAN FIREBASE (REAL-TIME)
+    // 3. SINKRONISASI DATA DENGAN FIREBASE (DENGAN PENANGANAN ERROR)
     // =========================================================================
     if (gameRef) {
         gameRef.child('players').on('value', (snapshot) => {
-            players = snapshot.val() || {};
+            let dbData = snapshot.val();
+            
+            // Jika database kosong (baru dibuat atau di-reset guru)
+            if (!dbData) {
+                players = {};
+                if (myId) {
+                    localStorage.removeItem('sortingRaceMyId');
+                    myId = null;
+                    document.getElementById('join-section').style.display = 'block';
+                    document.getElementById('play-section').style.display = 'none';
+                    alert("Sesi permainan telah di-reset oleh Guru. Silakan bergabung kembali!");
+                }
+                updateBoard();
+                return;
+            }
+
+            players = dbData;
             
             if (myId && players[myId]) {
                 document.getElementById('join-section').style.display = 'none';
@@ -448,8 +453,11 @@
                 document.getElementById('my-avatar').innerText = players[myId].ava;
                 document.getElementById('current-pos').innerText = players[myId].pos;
             } else if (myId && !players[myId]) {
+                // Kamu dihapus dari database secara sepihak
                 localStorage.removeItem('sortingRaceMyId');
-                location.reload();
+                myId = null;
+                document.getElementById('join-section').style.display = 'block';
+                document.getElementById('play-section').style.display = 'none';
             }
             updateBoard();
         });
@@ -465,20 +473,17 @@
         });
     }
 
-    // PERBAIKAN BUG FIREBASE: Update data per user agar tidak saling menimpa
+    // Fungsi menyimpan yang SPESIFIK per akun (Tidak menimpa akun lain!)
     function saveGameState() { 
         if(gameRef && myId && players[myId]) {
-            gameRef.child('players').child(myId).set(players[myId])
-            .catch(error => {
-                alert("Koneksi Firebase gagal! Cek URL Database Anda. Error: " + error.message);
-            });
+            gameRef.child('players').child(myId).set(players[myId]); 
         } 
     }
     function saveTimerState() { if(gameRef) gameRef.child('timer').set(timerData); }
 
 
     // =========================================================================
-    // 4. LOGIKA PERMAINAN
+    // 4. LOGIKA PERMAINAN UTAMA
     // =========================================================================
     function getCellCoord(cellNum) {
         let zeroIndex = cellNum - 1; 
@@ -674,10 +679,12 @@
         }
     }
 
+    // =========================================================================
+    // UPDATE: TAMPILAN LANGSUNG MUNCUL SAAT KLIK JOIN MESKIPUN SERVER LEMOT
+    // =========================================================================
     function joinGame() {
         const name = document.getElementById('player-name').value.trim();
         if (!name) return showCustomResult("⚠️", "HEI!", "Ketik namamu dulu sebelum bermain.", "var(--btn-red)", true, null);
-        if (!gameRef) return alert("Firebase belum dikonfigurasi. Anda tidak bisa bergabung ke server.");
         
         myId = 'player_' + Math.random().toString(36).substr(2, 9);
         let myAva = avatars[Math.floor(Math.random() * avatars.length)];
@@ -693,6 +700,15 @@
         };
         
         localStorage.setItem('sortingRaceMyId', myId); 
+
+        // Update Layar Seketika (Tanpa Nunggu Server Loading)
+        document.getElementById('join-section').style.display = 'none';
+        document.getElementById('play-section').style.display = 'block';
+        document.getElementById('my-name').innerText = name.toUpperCase();
+        document.getElementById('my-avatar').innerText = myAva;
+        document.getElementById('current-pos').innerText = "1";
+        updateBoard(); 
+
         saveGameState(); 
     }
 
