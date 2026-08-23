@@ -15,11 +15,11 @@
         }
         * { box-sizing: border-box; }
         body {
-            margin: 0; padding: 10px 20px; background-color: var(--bg-color);
+            margin: 0; padding: 15px 25px; background-color: var(--bg-color);
             background-image: linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px),
             linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px);
             background-size: 20px 20px; font-family: 'Nunito', sans-serif; 
-            display: flex; flex-direction: column; gap: 10px; height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column; gap: 15px; height: 100vh; overflow: hidden;
         }
 
         .pixel-text { font-family: 'Press Start 2P', cursive; }
@@ -27,14 +27,14 @@
         /* --- JUDUL GAME INTERAKTIF --- */
         .game-title {
             text-align: center; margin: 0px 0 5px 0;
-            font-size: clamp(16px, 2vw, 24px); letter-spacing: 2px;
+            font-size: clamp(20px, 2.5vw, 32px); letter-spacing: 2px;
             
             background: linear-gradient(90deg, #e74c3c, #f1c40f, #2ecc71, #3498db, #9b59b6, #e74c3c);
             background-size: 200% auto;
             color: transparent;
             -webkit-background-clip: text;
             background-clip: text;
-            text-shadow: 2px 2px 0px rgba(30,39,46,0.2);
+            text-shadow: 3px 3px 0px rgba(30,39,46,0.15);
             
             animation: shine 4s linear infinite, floatTitle 3s ease-in-out infinite;
         }
@@ -52,29 +52,31 @@
         /* --- KIRI: AREA GAME --- */
         #left-col {
             flex: 1; display: flex; flex-direction: column; align-items: stretch; 
-            gap: 10px; min-width: 0; min-height: 0;
+            gap: 15px; min-width: 0; min-height: 0;
         }
         
-        /* --- TOP BAR (RENTANG PENUH KIRI KE KANAN) --- */
+        /* --- TOP BAR --- */
         .top-bar {
             width: 100%; display: flex; justify-content: space-between; align-items: center; 
-            background: white; padding: 8px 15px; border-radius: 12px;
+            background: white; padding: 12px 20px; border-radius: 12px;
             border: 4px solid var(--border-dark); box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
         
-        .top-left-group { display: flex; align-items: center; gap: 12px; }
+        .top-left-group { flex: 1; display: flex; align-items: center; gap: 12px; justify-content: flex-start; }
+        .top-center-group { flex: 1; display: flex; justify-content: center; align-items: center;}
+        .guru-actions { flex: 1; display: flex; gap: 10px; align-items: center; justify-content: flex-end;}
         
         .timer-box {
-            background: #e84118; color: white; padding: 8px 14px;
-            border-radius: 8px; font-size: 15px; border: 3px solid var(--border-dark);
-            box-shadow: 3px 3px 0px var(--border-dark); display: flex; align-items: center; gap: 8px;
+            background: #e84118; color: white; padding: 12px 18px;
+            border-radius: 8px; font-size: 18px; border: 3px solid var(--border-dark);
+            box-shadow: 4px 4px 0px var(--border-dark); display: flex; align-items: center; gap: 8px;
         }
 
-        .timer-controls { display: flex; gap: 6px; }
+        .timer-controls { display: flex; gap: 8px; }
         
         .btn-mini {
-            width: 36px; height: 36px; padding: 0; display: flex; justify-content: center; align-items: center;
-            font-size: 12px; border: 3px solid var(--border-dark); box-shadow: 3px 3px 0px var(--border-dark);
+            width: 44px; height: 44px; padding: 0; display: flex; justify-content: center; align-items: center;
+            font-size: 16px; border: 3px solid var(--border-dark); box-shadow: 4px 4px 0px var(--border-dark);
             border-radius: 8px; cursor: pointer; color: var(--border-dark); transition: 0.1s;
         }
         .btn-mini:active { transform: translate(3px, 3px); box-shadow: 0px 0px 0px var(--border-dark); }
@@ -83,19 +85,17 @@
         .btn-mini.bg-red { background: #e74c3c; color: white;}
 
         .badge {
-            background: #f1f2f6; padding: 8px 14px; border-radius: 20px;
-            font-size: 12px; font-weight: 900; color: #57606f; white-space: nowrap; border: 2px solid #dfe4ea;
+            background: #f1f2f6; padding: 10px 20px; border-radius: 20px;
+            font-size: 14px; font-weight: 900; color: #57606f; white-space: nowrap; border: 3px solid #dfe4ea;
         }
 
-        /* Group Aksi Guru (Satu Baris) */
-        .guru-actions { display: flex; gap: 10px; align-items: center; }
-        
         .btn-guru-inline {
             border: 3px solid var(--border-dark); border-radius: 8px;
-            font-size: 9px; font-family: 'Press Start 2P', cursive;
-            cursor: pointer; box-shadow: 3px 3px 0px var(--border-dark);
-            transition: all 0.1s; text-align: center; padding: 8px 12px; 
-            display: flex; align-items: center; justify-content: center; gap: 6px; line-height: 1.3;
+            font-size: 10px; font-family: 'Press Start 2P', cursive;
+            cursor: pointer; box-shadow: 4px 4px 0px var(--border-dark);
+            transition: all 0.1s; text-align: center; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            gap: 6px; line-height: 1.4; width: 85px; height: 65px; padding: 5px;
         }
         .btn-guru-inline:active { transform: translate(3px, 3px); box-shadow: 0px 0px 0px var(--border-dark); }
         .btn-guru-inline.bg-yellow { background: var(--btn-yellow); color: var(--border-dark); }
@@ -104,33 +104,33 @@
 
         /* --- KANAN: PANEL KONTROL MURID --- */
         #right-col {
-            flex: 0 0 350px; background: var(--panel-bg);
+            flex: 0 0 380px; background: var(--panel-bg);
             border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             display: flex; flex-direction: column; overflow-y: auto;
             border: 4px solid var(--border-dark); height: 100%;
         }
 
-        .panel-section { padding: 18px; border-bottom: 4px solid var(--border-dark); }
+        .panel-section { padding: 20px; border-bottom: 4px solid var(--border-dark); }
         
         .player-card {
             background: white; border: 3px solid var(--border-dark); border-radius: 10px;
-            padding: 12px; display: flex; align-items: center; gap: 12px;
-            box-shadow: 3px 3px 0px rgba(0,0,0,0.1);
+            padding: 15px; display: flex; align-items: center; gap: 15px;
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
         }
         .avatar-box {
-            width: 48px; height: 48px; background: #dfe4ea; border-radius: 50%;
-            display: flex; justify-content: center; align-items: center; font-size: 26px;
-            border: 2px solid #ced6e0;
+            width: 60px; height: 60px; background: #dfe4ea; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center; font-size: 35px;
+            border: 3px solid #ced6e0;
         }
-        .player-info h3 { margin: 0 0 4px 0; font-size: 13px; color: var(--border-dark); }
-        .player-info p { margin: 0; font-size: 12px; color: #747d8c; font-weight: 900;}
-        .player-info b { font-size: 16px; color: #2980b9; }
+        .player-info h3 { margin: 0 0 5px 0; font-size: 16px; color: var(--border-dark); }
+        .player-info p { margin: 0; font-size: 14px; color: #747d8c; font-weight: 900;}
+        .player-info b { font-size: 18px; color: #2980b9; }
 
-        .dice-area { display: flex; align-items: center; gap: 12px; margin-top: 15px; }
+        .dice-area { display: flex; align-items: center; gap: 15px; margin-top: 20px; }
         .dice-icon {
-            width: 55px; height: 55px; background: white; border: 3px solid var(--border-dark);
+            width: 80px; height: 80px; background: white; border: 4px solid var(--border-dark);
             border-radius: 10px; display: flex; justify-content: center; align-items: center;
-            font-size: 26px; box-shadow: 3px 3px 0px var(--border-dark); transition: transform 0.1s;
+            font-size: 40px; box-shadow: 4px 4px 0px var(--border-dark); transition: transform 0.1s;
         }
         
         @keyframes spinDice3D {
@@ -145,42 +145,43 @@
         
         .btn {
             border: 3px solid var(--border-dark); border-radius: 8px;
-            padding: 12px; font-size: 12px; cursor: pointer;
-            box-shadow: 3px 3px 0px var(--border-dark); transition: all 0.1s; 
-            text-align: center; color: var(--border-dark); line-height: 1.4; background: var(--btn-green);
+            font-size: 16px; cursor: pointer; height: 80px; display: flex;
+            align-items: center; justify-content: center; text-align: center;
+            box-shadow: 4px 4px 0px var(--border-dark); transition: all 0.1s; 
+            color: var(--border-dark); line-height: 1.4; background: var(--btn-green);
         }
-        .btn:active { transform: translate(3px, 3px); box-shadow: 0px 0px 0px var(--border-dark); }
+        .btn:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
         .btn:disabled { filter: grayscale(100%); cursor: not-allowed; transform: none; box-shadow: none; opacity: 0.7;}
         
-        .rules-text { font-size: 10px; color: #57606f; font-weight: 900; margin-top: 12px; text-align: center; line-height: 1.4;}
+        .rules-text { font-size: 11px; color: #57606f; font-weight: 900; margin-top: 15px; text-align: center; line-height: 1.5;}
 
         #join-section input {
-            width: 100%; padding: 14px; border: 3px solid var(--border-dark);
+            width: 100%; padding: 15px; border: 3px solid var(--border-dark);
             border-radius: 8px; font-size: 14px; font-weight: bold; font-family: inherit; outline: none;
         }
 
         /* --- KLASEMEN & PAPAN --- */
         .leaderboard-header {
             background: var(--border-dark); color: white; text-align: center;
-            padding: 10px; font-size: 11px; border-radius: 6px; margin-bottom: 12px; letter-spacing: 1px;
+            padding: 15px; font-size: 14px; border-radius: 8px; margin-bottom: 15px; 
+            letter-spacing: 1px; box-shadow: 4px 4px 0px rgba(0,0,0,0.15);
         }
         .lb-item {
-            border: 2px solid var(--border-dark); border-radius: 8px;
-            padding: 10px 12px; display: flex; align-items: center; gap: 10px;
-            margin-bottom: 8px; background: #e3f2fd;
+            border: 3px solid var(--border-dark); border-radius: 8px;
+            padding: 12px 15px; display: flex; align-items: center; gap: 12px;
+            margin-bottom: 10px; background: #e3f2fd;
         }
-        .lb-item h4 { margin: 0 0 3px 0; font-size: 12px; color: var(--border-dark); line-height: 1.2;}
-        .lb-item p { margin: 0; font-size: 11px; color: #2980b9; font-weight: bold; }
-        .lb-rank { font-size: 12px; color: #7f8c8d; font-weight: bold; width: 20px;}
+        .lb-item h4 { margin: 0 0 5px 0; font-size: 14px; color: var(--border-dark); line-height: 1.2;}
+        .lb-item p { margin: 0; font-size: 12px; color: #2980b9; font-weight: bold; }
+        .lb-rank { font-size: 16px; color: #7f8c8d; font-weight: bold; width: 25px;}
 
-        /* PAPAN PAS 1 LAYAR TANPA SCROLL */
+        /* Wrapper Container agar tinggi board maksimal responsif */
+        .board-container {
+            flex: 1; display: flex; justify-content: center; align-items: center;
+            width: 100%; min-height: 0; padding-bottom: 10px;
+        }
         #board-wrapper {
-            position: relative; 
-            height: 100%; 
-            max-height: 100%;
-            min-height: 0;
-            width: auto; 
-            aspect-ratio: 1 / 1; 
+            position: relative; height: 100%; max-width: 100%; aspect-ratio: 1 / 1; 
             border: 6px solid var(--border-dark); border-radius: 8px;
             box-shadow: 6px 6px 0px rgba(0,0,0,0.15); background: white; margin: 0 auto;
         }
@@ -204,23 +205,13 @@
         }
 
         .player-token {
-            width: clamp(20px, 3.5vmin, 32px); height: clamp(20px, 3.5vmin, 32px);
+            width: clamp(24px, 4vmin, 36px); height: clamp(24px, 4vmin, 36px);
             position: absolute; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
             z-index: 10; transform: translate(-50%, -50%); display: flex; 
-            justify-content: center; align-items: center; font-size: clamp(12px, 2vmin, 20px);
-            background: white; border-radius: 50%; border: 2px solid var(--border-dark);
+            justify-content: center; align-items: center; font-size: clamp(14px, 2.5vmin, 22px);
+            background: white; border-radius: 50%; border: 3px solid var(--border-dark);
             box-shadow: 2px 2px 0px rgba(0,0,0,0.3); pointer-events: none; 
         }
-
-        .cell-tooltip {
-            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
-            background: var(--border-dark); color: white; padding: 6px 10px; border-radius: 6px; 
-            font-family: 'Press Start 2P', cursive; font-size: 8px; white-space: nowrap; 
-            opacity: 0; visibility: hidden; transition: 0.2s; pointer-events: none; 
-            z-index: 100; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            text-align: center; line-height: 1.4;
-        }
-        .cell:hover .cell-tooltip { opacity: 1; visibility: visible; }
 
         /* --- MODAL --- */
         .modal-overlay {
@@ -269,10 +260,10 @@
         }
         @media (max-width: 768px) {
             .top-bar { flex-direction: column; align-items: stretch; gap: 10px;}
-            .top-left-group { justify-content: space-between; }
-            .guru-actions { flex-wrap: wrap; justify-content: center;}
-            .btn-guru-inline { flex: 1; min-width: 100px;}
-            .game-title { font-size: 14px; letter-spacing: 1px;}
+            .top-left-group, .top-center-group, .guru-actions { justify-content: center; }
+            .guru-actions { flex-wrap: wrap; }
+            .btn-guru-inline { flex: 1; min-width: 100px; height: auto; padding: 10px;}
+            .game-title { font-size: 16px; letter-spacing: 1px;}
         }
     </style>
 </head>
@@ -285,34 +276,49 @@
         <div class="top-bar">
             <div class="top-left-group">
                 <div class="timer-box pixel-text" id="timer-display">
-                    <span style="font-size:12px;">⏱</span> 15:00
+                    <span style="font-size:16px;">⏱</span> 15:00
                 </div>
                 <div class="timer-controls">
                     <button onclick="askPinForAction('timer_start')" title="Mulai Waktu" class="btn-mini bg-green pixel-text">▶</button>
                     <button onclick="askPinForAction('timer_pause')" title="Jeda Waktu" class="btn-mini bg-yellow pixel-text">⏸</button>
                     <button onclick="askPinForAction('timer_reset')" title="Reset Waktu" class="btn-mini bg-red pixel-text">🔄</button>
                 </div>
-                <span class="badge">Pemain: <b id="player-count-num" style="color:#0984e3; font-size:14px;">0/44</b></span>
+            </div>
+            
+            <div class="top-center-group">
+                <span class="badge">Pemain: <b id="player-count-num" style="color:#0984e3; font-size:16px;">0/44</b></span>
             </div>
 
             <div class="guru-actions">
-                <button id="btn-music" class="btn-guru-inline bg-yellow pixel-text" onclick="toggleMusic()">🔊 Musik ON</button>
-                <button onclick="askPinForAction('download_csv')" class="btn-guru-inline bg-purple pixel-text">📥 Unduh CSV</button>
-                <button onclick="askPinForAction('delete_data')" class="btn-guru-inline bg-red pixel-text">🗑️ Hapus Data</button>
+                <button id="btn-music" class="btn-guru-inline bg-yellow pixel-text" onclick="toggleMusic()">
+                    <span style="font-size: 14px;">🔊</span>
+                    <span>Musik<br>ON</span>
+                </button>
+                <button onclick="askPinForAction('download_csv')" class="btn-guru-inline bg-purple pixel-text">
+                    <span style="font-size: 14px;">📥</span>
+                    <span>Unduh<br>CSV</span>
+                </button>
+                <button onclick="askPinForAction('delete_data')" class="btn-guru-inline bg-red pixel-text">
+                    <span style="font-size: 14px;">🗑️</span>
+                    <span>Hapus<br>Data</span>
+                </button>
             </div>
         </div>
         
-        <div id="board-wrapper">
-            <div id="board"></div>
-            <svg id="svg-layer" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+        <!-- Board Container khusus agar ukuran board merespon secara simetris -->
+        <div class="board-container">
+            <div id="board-wrapper">
+                <div id="board"></div>
+                <svg id="svg-layer" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+            </div>
         </div>
     </div>
 
     <div id="right-col">
         <div id="join-section" class="panel-section">
-            <h3 class="pixel-text" style="font-size: 13px; text-align: center; margin-bottom:20px; color:#2c3e50; line-height: 1.4;">GABUNG BALAPAN!</h3>
+            <h3 class="pixel-text" style="font-size: 14px; text-align: center; margin-bottom:20px; color:#2c3e50; line-height: 1.4;">GABUNG BALAPAN!</h3>
             <input type="text" id="player-name" placeholder="Ketik namamu di sini..." style="margin-bottom: 15px;">
-            <button class="btn pixel-text" onclick="joinGame()" style="width: 100%;">MASUK ARENA</button>
+            <button class="btn pixel-text" style="width: 100%; height: auto; padding: 15px;" onclick="joinGame()">MASUK ARENA</button>
         </div>
 
         <div id="play-section" style="display: none;">
@@ -356,7 +362,7 @@
         <span class="result-icon" id="result-icon">🎯</span>
         <h2 class="pixel-text" id="result-title">HASIL</h2>
         <p id="result-desc">Deskripsi pergerakan.</p>
-        <button id="btn-result-close" class="btn pixel-text" style="width: 100%; font-size: 14px; padding:15px;" onclick="closeResultModal()">LANJUT</button>
+        <button id="btn-result-close" class="btn pixel-text" style="width: 100%; height:auto; font-size: 14px; padding:15px;" onclick="closeResultModal()">LANJUT</button>
     </div>
 </div>
 
@@ -368,8 +374,8 @@
         <p>Masukkan PIN untuk melanjutkan tindakan:</p>
         <input type="password" id="guru-pin-input" class="pin-input" maxlength="4" placeholder="••••">
         <div style="display:flex; gap:12px; margin-top: 10px;">
-            <button class="btn pixel-text" style="flex:1; background:#e74c3c; color:white; padding:12px;" onclick="closePinModal()">BATAL</button>
-            <button class="btn pixel-text" style="flex:1; background:#2ecc71; padding:12px;" onclick="verifyGuruPin()">MASUK</button>
+            <button class="btn pixel-text" style="flex:1; background:#e74c3c; color:white; padding:12px; height:auto;" onclick="closePinModal()">BATAL</button>
+            <button class="btn pixel-text" style="flex:1; background:#2ecc71; padding:12px; height:auto;" onclick="verifyGuruPin()">MASUK</button>
         </div>
     </div>
 </div>
@@ -417,12 +423,12 @@
             Tone.Transport.start();
             melody.start(0);
             isMusicPlaying = true;
-            document.getElementById('btn-music').innerText = "🔊 Musik OFF";
+            document.getElementById('btn-music').innerHTML = '<span style="font-size: 14px;">🔊</span><span>Musik<br>OFF</span>';
         } else {
             melody.stop();
             Tone.Transport.stop();
             isMusicPlaying = false;
-            document.getElementById('btn-music').innerText = "🔊 Musik ON";
+            document.getElementById('btn-music').innerHTML = '<span style="font-size: 14px;">🔊</span><span>Musik<br>ON</span>';
         }
     }
 
@@ -575,17 +581,19 @@
         let rem = Math.ceil(timerData.remaining);
         let mins = Math.floor(rem / 60);
         let secs = rem % 60;
-        display.innerHTML = `<span style="font-size:12px;">⏱</span> ${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+        display.innerHTML = `<span style="font-size:16px;">⏱</span> ${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
         
         let rollBtn = document.getElementById('btn-roll');
         if (rollBtn) {
             if (timerData.isRunning) {
                 rollBtn.disabled = false;
                 rollBtn.style.background = "#2ecc71";
+                rollBtn.style.color = "var(--border-dark)";
                 rollBtn.innerHTML = "LEMPAR<br>DADU";
             } else {
                 rollBtn.disabled = true;
                 rollBtn.style.background = "#e74c3c";
+                rollBtn.style.color = "white";
                 rollBtn.innerHTML = "TUNGGU<br>GURU";
             }
         }
@@ -738,7 +746,7 @@
             lbHtml += `
                 <div class="lb-item">
                     <span class="lb-rank">#${rank+1}</span>
-                    <span style="font-size:18px;">${p.ava}</span>
+                    <span style="font-size:24px;">${p.ava}</span>
                     <div style="flex:1;">
                         <h4>${p.name}</h4>
                         <p>Posisi: ${p.pos}/100 ${p.isFinish ? '🏁' : ''}</p>
