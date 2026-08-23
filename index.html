@@ -25,118 +25,118 @@
             background-image: linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px),
             linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px);
             background-size: 20px 20px; font-family: 'Nunito', sans-serif; 
-            display: flex; flex-direction: column; gap: 20px; height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column; gap: 15px; height: 100vh; overflow: hidden;
         }
 
         .pixel-text { font-family: 'Press Start 2P', cursive; }
 
         /* --- JUDUL GAME --- */
         .game-title {
-            text-align: center; color: var(--border-dark); margin: 5px 0 10px 0;
-            font-size: clamp(16px, 2vw, 24px); text-shadow: 2px 2px 0px white;
-            letter-spacing: 2px;
+            text-align: center; margin: 0 0 5px 0;
+            font-size: clamp(14px, 2vw, 24px); letter-spacing: 2px;
+            background: linear-gradient(90deg, #e74c3c, #f1c40f, #2ecc71, #3498db, #9b59b6, #e74c3c);
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            text-shadow: 2px 2px 0px rgba(30,39,46,0.1);
+            animation: shine 4s linear infinite, floatTitle 3s ease-in-out infinite;
+        }
+        @keyframes shine { to { background-position: 200% center; } }
+        @keyframes floatTitle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
         }
 
         /* --- MAIN LAYOUT --- */
         .main-container {
-            display: flex; flex-direction: row; gap: 30px; flex: 1; min-height: 0;
+            display: flex; flex-direction: row; gap: 25px; flex: 1; min-height: 0;
+            justify-content: center; /* Meratakan seluruh konten ke tengah layar */
         }
         
         /* --- KIRI: AREA GAME --- */
+        /* PERBAIKAN: Membatasi lebar kolom kiri agar Top Bar & Papan sejajar persis */
         #left-col {
-            flex: 1; display: flex; flex-direction: column; align-items: center; 
-            gap: 20px; min-width: 0;
+            flex: 1; display: flex; flex-direction: column; align-items: stretch; 
+            gap: 15px; min-width: 0;
+            max-width: calc(100vh - 170px); /* KUNCI RAHASIA: Membatasi lebar maksimum sesuai tinggi sisa layar */
         }
         
-        /* --- TOP BAR (RENTANG PENUH KIRI KE KANAN) --- */
+        /* --- TOP BAR (DIPERKECIL) --- */
         .top-bar {
-            width: 100%; /* Merentang penuh */
-            display: flex; justify-content: space-between; align-items: center; flex-wrap: nowrap; gap: 15px;
-            background: white; padding: 15px 25px; border-radius: 12px;
-            border: 4px solid var(--border-dark); box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            width: 100%; display: flex; justify-content: space-between; align-items: center; 
+            background: white; padding: 10px 20px; border-radius: 10px;
+            border: 4px solid var(--border-dark); box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
         
-        .top-left-group { display: flex; align-items: center; gap: 15px; }
+        .top-left-group { display: flex; align-items: center; gap: 12px; }
         
         .timer-box {
-            background: #e84118; color: white; padding: 10px 20px;
-            border-radius: 8px; font-size: 18px; border: 4px solid var(--border-dark);
-            box-shadow: 4px 4px 0px var(--border-dark); display: flex; align-items: center; gap: 10px;
+            background: #e84118; color: white; padding: 8px 15px;
+            border-radius: 6px; font-size: 14px; border: 3px solid var(--border-dark);
+            box-shadow: 3px 3px 0px var(--border-dark); display: flex; align-items: center; gap: 8px;
         }
 
-        .timer-controls { display: flex; gap: 8px; }
+        .timer-controls { display: flex; gap: 6px; }
         
         .btn-mini {
-            width: 45px; height: 45px; padding: 0; display: flex; justify-content: center; align-items: center;
-            font-size: 14px; border: 4px solid var(--border-dark); box-shadow: 4px 4px 0px var(--border-dark);
-            border-radius: 8px; cursor: pointer; color: var(--border-dark); transition: 0.1s;
+            width: 35px; height: 35px; padding: 0; display: flex; justify-content: center; align-items: center;
+            font-size: 12px; border: 3px solid var(--border-dark); box-shadow: 3px 3px 0px var(--border-dark);
+            border-radius: 6px; cursor: pointer; color: var(--border-dark); transition: 0.1s;
         }
-        .btn-mini:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
+        .btn-mini:active { transform: translate(3px, 3px); box-shadow: 0px 0px 0px var(--border-dark); }
         .btn-mini.bg-green { background: #2ecc71; }
         .btn-mini.bg-yellow { background: #f1c40f; }
         .btn-mini.bg-red { background: #e74c3c; color: white;}
 
         .badge {
-            background: #f1f2f6; padding: 10px 15px; border-radius: 20px;
-            font-size: 12px; font-weight: 900; color: #57606f; white-space: nowrap; border: 2px solid #dfe4ea;
+            background: #f1f2f6; padding: 8px 12px; border-radius: 20px;
+            font-size: 11px; font-weight: 900; color: #57606f; white-space: nowrap; border: 2px solid #dfe4ea;
         }
 
-        /* Group Aksi Guru Kanan */
-        .guru-actions { display: flex; gap: 12px; align-items: stretch; }
+        .guru-actions { display: flex; gap: 10px; align-items: center; }
         
-        .btn-guru-tall {
-            background: var(--btn-yellow); color: var(--border-dark);
-            border: 4px solid var(--border-dark); border-radius: 8px;
-            font-size: 10px; font-family: 'Press Start 2P', cursive;
-            cursor: pointer; box-shadow: 4px 4px 0px var(--border-dark);
-            transition: all 0.1s; text-align: center; line-height: 1.8;
-            padding: 10px 20px; display: flex; flex-direction: column; justify-content: center; align-items: center;
+        .btn-guru-inline {
+            border: 3px solid var(--border-dark); border-radius: 6px;
+            font-size: 9px; font-family: 'Press Start 2P', cursive;
+            cursor: pointer; box-shadow: 3px 3px 0px var(--border-dark);
+            transition: all 0.1s; text-align: center; padding: 8px 12px; 
+            display: flex; align-items: center; justify-content: center; gap: 6px; line-height: 1.5;
         }
-        .btn-guru-tall:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
-        
-        .btn-guru-stack { display: flex; flex-direction: column; gap: 8px; justify-content: center;}
-        
-        .btn-guru-small {
-            border: 4px solid var(--border-dark); border-radius: 8px;
-            font-size: 10px; font-family: 'Press Start 2P', cursive;
-            cursor: pointer; box-shadow: 4px 4px 0px var(--border-dark);
-            transition: all 0.1s; text-align: center; color: white;
-            padding: 10px 15px; flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
-        .btn-guru-small:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
-        .btn-guru-small.bg-purple { background: var(--btn-purple); }
-        .btn-guru-small.bg-red { background: #c0392b; }
+        .btn-guru-inline:active { transform: translate(3px, 3px); box-shadow: 0px 0px 0px var(--border-dark); }
+        .btn-guru-inline.bg-yellow { background: var(--btn-yellow); color: var(--border-dark); }
+        .btn-guru-inline.bg-purple { background: var(--btn-purple); color: white; }
+        .btn-guru-inline.bg-red { background: #c0392b; color: white; }
 
         /* --- KANAN: PANEL KONTROL MURID --- */
         #right-col {
-            flex: 0 0 380px; 
-            background: var(--panel-bg);
-            border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            flex: 0 0 340px; background: var(--panel-bg);
+            border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08);
             display: flex; flex-direction: column; overflow-y: auto;
             border: 4px solid var(--border-dark); height: 100%;
         }
 
-        .panel-section { padding: 25px; border-bottom: 4px solid var(--border-dark); }
+        .panel-section { padding: 20px; border-bottom: 4px solid var(--border-dark); }
         
         .player-card {
             background: white; border: 4px solid var(--border-dark); border-radius: 10px;
-            padding: 15px; display: flex; align-items: center; gap: 15px;
+            padding: 12px; display: flex; align-items: center; gap: 12px;
             box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
         }
         .avatar-box {
-            width: 55px; height: 55px; background: #dfe4ea; border-radius: 50%;
-            display: flex; justify-content: center; align-items: center; font-size: 32px;
+            width: 45px; height: 45px; background: #dfe4ea; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center; font-size: 26px;
             border: 3px solid #ced6e0;
         }
-        .player-info h3 { margin: 0 0 5px 0; font-size: 15px; color: var(--border-dark); }
-        .player-info p { margin: 0; font-size: 13px; color: #747d8c; font-weight: 900;}
-        .player-info b { font-size: 18px; color: #2980b9; }
+        .player-info h3 { margin: 0 0 5px 0; font-size: 14px; color: var(--border-dark); }
+        .player-info p { margin: 0; font-size: 12px; color: #747d8c; font-weight: 900;}
+        .player-info b { font-size: 16px; color: #2980b9; }
 
-        .dice-area { display: flex; align-items: center; gap: 15px; margin-top: 25px; }
+        .dice-area { display: flex; align-items: center; gap: 15px; margin-top: 20px; }
         .dice-icon {
-            width: 70px; height: 70px; background: white; border: 4px solid var(--border-dark);
-            border-radius: 10px; display: flex; justify-content: center; align-items: center;
-            font-size: 32px; box-shadow: 4px 4px 0px var(--border-dark); transition: transform 0.1s;
+            width: 60px; height: 60px; background: white; border: 4px solid var(--border-dark);
+            border-radius: 8px; display: flex; justify-content: center; align-items: center;
+            font-size: 28px; box-shadow: 4px 4px 0px var(--border-dark); transition: transform 0.1s;
         }
         
         @keyframes spinDice3D {
@@ -144,55 +144,54 @@
             50% { transform: rotate(180deg) scale(1.2); background-color: var(--btn-yellow); }
             100% { transform: rotate(360deg) scale(1); background-color: white; }
         }
-        .rolling-dice {
-            animation: spinDice3D 0.2s infinite linear !important;
-            color: var(--border-dark);
-        }
+        .rolling-dice { animation: spinDice3D 0.2s infinite linear !important; color: var(--border-dark); }
         
         .btn {
             border: 4px solid var(--border-dark); border-radius: 8px;
-            padding: 18px; font-size: 14px; cursor: pointer;
+            padding: 15px; font-size: 12px; cursor: pointer;
             box-shadow: 4px 4px 0px var(--border-dark); transition: all 0.1s; 
             text-align: center; color: var(--border-dark); line-height: 1.5; background: var(--btn-green);
         }
         .btn:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
         .btn:disabled { filter: grayscale(100%); cursor: not-allowed; transform: none; box-shadow: none; opacity: 0.7;}
         
-        .rules-text { font-size: 11px; color: #57606f; font-weight: 900; margin-top: 20px; text-align: center; line-height:1.6;}
+        .rules-text { font-size: 10px; color: #57606f; font-weight: 900; margin-top: 15px; text-align: center; line-height:1.5;}
 
         #join-section input {
-            width: 100%; padding: 18px; border: 4px solid var(--border-dark);
-            border-radius: 8px; font-size: 15px; font-weight: bold; font-family: inherit; outline: none;
+            width: 100%; padding: 15px; border: 4px solid var(--border-dark);
+            border-radius: 8px; font-size: 14px; font-weight: bold; font-family: inherit; outline: none;
         }
 
         /* --- KLASEMEN & PAPAN --- */
         .leaderboard-header {
             background: var(--border-dark); color: white; text-align: center;
-            padding: 15px; font-size: 13px; border-radius: 6px; margin-bottom: 20px; letter-spacing: 1px;
+            padding: 12px; font-size: 12px; border-radius: 6px; margin-bottom: 15px; letter-spacing: 1px;
         }
         .lb-item {
             border: 3px solid var(--border-dark); border-radius: 8px;
-            padding: 12px 15px; display: flex; align-items: center; gap: 12px;
-            margin-bottom: 12px; background: #e3f2fd;
+            padding: 10px 12px; display: flex; align-items: center; gap: 10px;
+            margin-bottom: 10px; background: #e3f2fd;
         }
-        .lb-item h4 { margin: 0 0 5px 0; font-size: 13px; color: var(--border-dark); line-height: 1.3;}
-        .lb-item p { margin: 0; font-size: 12px; color: #2980b9; font-weight: bold; }
-        .lb-rank { font-size: 14px; color: #7f8c8d; font-weight: bold; width: 25px;}
+        .lb-item h4 { margin: 0 0 4px 0; font-size: 12px; color: var(--border-dark); line-height: 1.3;}
+        .lb-item p { margin: 0; font-size: 11px; color: #2980b9; font-weight: bold; }
+        .lb-rank { font-size: 13px; color: #7f8c8d; font-weight: bold; width: 22px;}
 
+        /* --- PAPAN PERMAINAN --- */
         #board-wrapper {
-            position: relative; width: 100%; height: auto;
-            aspect-ratio: 1 / 1; max-height: 75vh; max-width: 75vh; 
-            border: 8px solid var(--border-dark); border-radius: 8px;
-            box-shadow: 8px 8px 0px rgba(0,0,0,0.15); background: white; margin: 0 auto;
+            position: relative; 
+            width: 100%; /* Akan 100% mengikuti batas kiri (max-width #left-col) */
+            aspect-ratio: 1 / 1; 
+            border: 6px solid var(--border-dark); border-radius: 8px;
+            box-shadow: 6px 6px 0px rgba(0,0,0,0.15); background: white; 
+            margin: 0; /* Tidak butuh margin auto karena #left-col sudah dibatasi */
         }
         #board {
             width: 100%; height: 100%; display: grid; 
             grid-template-columns: repeat(10, 1fr); grid-template-rows: repeat(10, 1fr);
         }
         .cell {
-            border: 1px solid rgba(0,0,0,0.3); display: flex; padding: 5px; 
-            font-weight: 900; font-size: clamp(12px, 1.8vmin, 16px);
-            position: relative; 
+            border: 1px solid rgba(0,0,0,0.3); display: flex; padding: 4px; 
+            font-weight: 900; font-size: clamp(10px, 1.5vmin, 14px); position: relative; 
         }
         .cell:nth-child(even) { background-color: #f1c40f; color: black; }
         .cell:nth-child(odd) { background-color: #e74c3c; color: white;}
@@ -201,88 +200,79 @@
         .cell:nth-child(7n) { background-color: #ecf0f1; color: black;}
 
         #svg-layer {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            pointer-events: none; z-index: 5;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5;
         }
 
         .player-token {
-            width: clamp(24px, 4vmin, 38px); height: clamp(24px, 4vmin, 38px);
+            width: clamp(20px, 3.5vmin, 32px); height: clamp(20px, 3.5vmin, 32px);
             position: absolute; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
             z-index: 10; transform: translate(-50%, -50%); display: flex; 
-            justify-content: center; align-items: center; font-size: clamp(16px, 2.5vmin, 24px);
+            justify-content: center; align-items: center; font-size: clamp(14px, 2.2vmin, 20px);
             background: white; border-radius: 50%; border: 3px solid var(--border-dark);
-            box-shadow: 3px 3px 0px rgba(0,0,0,0.3); pointer-events: none; 
+            box-shadow: 2px 2px 0px rgba(0,0,0,0.3); pointer-events: none; 
         }
 
-        /* TOOLTIP KOTAK */
         .cell-tooltip {
             position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
-            background: var(--border-dark); color: white; padding: 8px 12px; border-radius: 6px; 
-            font-family: 'Press Start 2P', cursive; font-size: 9px; white-space: nowrap; 
+            background: var(--border-dark); color: white; padding: 6px 10px; border-radius: 6px; 
+            font-family: 'Press Start 2P', cursive; font-size: 8px; white-space: nowrap; 
             opacity: 0; visibility: hidden; transition: 0.2s; pointer-events: none; 
             z-index: 100; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
             text-align: center; line-height: 1.6;
         }
         .cell:hover .cell-tooltip { opacity: 1; visibility: visible; }
 
-        /* --- MODAL (SOAL, HASIL, PIN) --- */
+        /* --- MODAL --- */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(30,39,46,0.9); z-index: 100; justify-content: center; align-items: center;
         }
         .modal-content {
-            background: white; padding: 35px; border-radius: 12px; border: 6px solid var(--border-dark);
-            width: 90%; max-width: 550px; box-shadow: 8px 8px 0px rgba(0,0,0,0.5);
+            background: white; padding: 30px; border-radius: 12px; border: 6px solid var(--border-dark);
+            width: 90%; max-width: 500px; box-shadow: 8px 8px 0px rgba(0,0,0,0.5);
             animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); max-height: 90vh; overflow-y: auto;
         }
         .option-btn {
-            display: block; width: 100%; padding: 18px; margin: 12px 0; border: 3px solid var(--border-dark);
+            display: block; width: 100%; padding: 15px; margin: 10px 0; border: 3px solid var(--border-dark);
             background: white; cursor: pointer; text-align: left; font-family: inherit;
-            border-radius: 8px; font-weight: 900; font-size: 15px; transition: 0.1s;
+            border-radius: 8px; font-weight: 900; font-size: 14px; transition: 0.1s;
         }
         .option-btn:hover { background: #f1f2f6; transform: translateX(5px); box-shadow: -4px 4px 0px var(--border-dark); }
         
-        .result-box { text-align: center; max-width: 450px; }
-        .result-box h2 { font-size: 22px; margin-bottom: 20px; line-height: 1.5; }
-        .result-box p { font-size: 15px; font-weight: bold; color: #57606f; line-height: 1.6; margin-bottom: 30px; }
-        .result-icon { font-size: 60px; margin-bottom: 20px; display: block; }
+        .result-box { text-align: center; max-width: 400px; }
+        .result-box h2 { font-size: 20px; margin-bottom: 15px; line-height: 1.5; }
+        .result-box p { font-size: 14px; font-weight: bold; color: #57606f; line-height: 1.6; margin-bottom: 25px; }
+        .result-icon { font-size: 50px; margin-bottom: 15px; display: block; }
         
         .pin-input {
-            width: 100%; padding: 15px; font-size: 28px; border: 3px solid var(--border-dark);
-            border-radius: 6px; margin: 20px 0; text-align: center; font-family: inherit; outline: none;
+            width: 100%; padding: 12px; font-size: 24px; border: 3px solid var(--border-dark);
+            border-radius: 6px; margin: 15px 0; text-align: center; font-family: inherit; outline: none;
             letter-spacing: 10px;
         }
 
         @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         @keyframes shakeAlert {
             0% { transform: translate(1px, 1px) rotate(0deg); }
-            10% { transform: translate(-1px, -2px) rotate(-1deg); }
             20% { transform: translate(-3px, 0px) rotate(1deg); }
-            30% { transform: translate(3px, 2px) rotate(0deg); }
             40% { transform: translate(1px, -1px) rotate(1deg); }
-            50% { transform: translate(-1px, 2px) rotate(-1deg); }
             60% { transform: translate(-3px, 1px) rotate(0deg); }
-            70% { transform: translate(3px, 1px) rotate(-1deg); }
             80% { transform: translate(-1px, -1px) rotate(1deg); }
-            90% { transform: translate(1px, 2px) rotate(0deg); }
             100% { transform: translate(1px, -2px) rotate(-1deg); }
         }
         .shake-anim { animation: shakeAlert 0.4s !important; }
 
         @media (max-width: 1024px) {
-            .main-container { flex-direction: column; overflow-y: auto; }
+            .main-container { flex-direction: column; overflow-y: auto; justify-content: flex-start;}
             #left-col, #right-col { width: 100%; flex: none; max-width: 100%; height: auto;}
-            #board-wrapper { max-width: 90vw; max-height: 90vw; }
-            body { height: auto; }
+            #board-wrapper { max-width: 90vw; max-height: 90vw; margin: 0 auto; }
+            body { height: auto; overflow: auto; }
         }
-
         @media (max-width: 768px) {
             .top-bar { flex-direction: column; align-items: stretch; gap: 15px;}
             .top-left-group { justify-content: space-between; }
-            .guru-actions { justify-content: stretch; flex-direction: column;}
-            .btn-guru-tall { width: 100%; flex-direction: row; gap: 15px; }
-            .btn-guru-stack { flex-direction: row;}
-            .game-title { font-size: 14px; }
+            .guru-actions { flex-wrap: wrap; justify-content: center;}
+            .btn-guru-inline { flex: 1; min-width: 120px;}
+            .game-title { font-size: 14px; letter-spacing: 1px;}
         }
     </style>
 </head>
@@ -295,22 +285,20 @@
         <div class="top-bar">
             <div class="top-left-group">
                 <div class="timer-box pixel-text" id="timer-display">
-                    <span style="font-size:14px;">⏱</span> 15:00
+                    <span style="font-size:12px;">⏱</span> 15:00
                 </div>
                 <div class="timer-controls">
                     <button onclick="askPinForAction('timer_start')" title="Mulai Waktu" class="btn-mini bg-green pixel-text">▶</button>
                     <button onclick="askPinForAction('timer_pause')" title="Jeda Waktu" class="btn-mini bg-yellow pixel-text">⏸</button>
                     <button onclick="askPinForAction('timer_reset')" title="Reset Waktu" class="btn-mini bg-red pixel-text">🔄</button>
                 </div>
-                <span class="badge">Pemain: <b id="player-count-num" style="color:#0984e3; font-size:16px;">0/44</b></span>
+                <span class="badge">Pemain: <b id="player-count-num" style="color:#0984e3; font-size:14px;">0/44</b></span>
             </div>
 
             <div class="guru-actions">
-                <button id="btn-music" class="btn-guru-tall pixel-text">🔊 Musik<br><br>OFF</button>
-                <div class="btn-guru-stack">
-                    <button onclick="askPinForAction('download_csv')" class="btn-guru-small bg-purple pixel-text">📥 Unduh CSV</button>
-                    <button onclick="askPinForAction('delete_data')" class="btn-guru-small bg-red pixel-text">🗑️ Hapus Data</button>
-                </div>
+                <button id="btn-music" class="btn-guru-inline bg-yellow pixel-text">🔊 Musik ON</button>
+                <button onclick="askPinForAction('download_csv')" class="btn-guru-inline bg-purple pixel-text">📥 Unduh CSV</button>
+                <button onclick="askPinForAction('delete_data')" class="btn-guru-inline bg-red pixel-text">🗑️ Hapus Data</button>
             </div>
         </div>
         
@@ -322,8 +310,8 @@
 
     <div id="right-col">
         <div id="join-section" class="panel-section">
-            <h3 class="pixel-text" style="font-size: 14px; text-align: center; margin-bottom:25px; color:#2c3e50; line-height: 1.5;">GABUNG BALAPAN!</h3>
-            <input type="text" id="player-name" placeholder="Ketik namamu di sini..." style="margin-bottom: 20px;">
+            <h3 class="pixel-text" style="font-size: 12px; text-align: center; margin-bottom:20px; color:#2c3e50; line-height: 1.5;">GABUNG BALAPAN!</h3>
+            <input type="text" id="player-name" placeholder="Ketik namamu di sini..." style="margin-bottom: 15px;">
             <button class="btn pixel-text" onclick="joinGame()" style="width: 100%;">MASUK ARENA</button>
         </div>
 
@@ -357,7 +345,7 @@
 <!-- Modal Soal -->
 <div id="question-modal" class="modal-overlay">
     <div class="modal-content">
-        <h3 id="q-text" style="line-height: 1.6; color:#2c3e50; margin-top:0; font-size: 18px;">Pertanyaan...</h3>
+        <h3 id="q-text" style="line-height: 1.6; color:#2c3e50; margin-top:0; font-size: 16px;">Pertanyaan...</h3>
         <div id="q-options"></div>
     </div>
 </div>
@@ -368,7 +356,7 @@
         <span class="result-icon" id="result-icon">🎯</span>
         <h2 class="pixel-text" id="result-title">HASIL</h2>
         <p id="result-desc">Deskripsi pergerakan.</p>
-        <button id="btn-result-close" class="btn pixel-text" style="width: 100%; font-size: 15px; padding:18px;" onclick="closeResultModal()">LANJUT</button>
+        <button id="btn-result-close" class="btn pixel-text" style="width: 100%; font-size: 14px; padding:15px;" onclick="closeResultModal()">LANJUT</button>
     </div>
 </div>
 
@@ -379,9 +367,9 @@
         <h2 class="pixel-text" style="color:#2c3e50;">AKSES GURU</h2>
         <p>Masukkan PIN untuk melanjutkan tindakan:</p>
         <input type="password" id="guru-pin-input" class="pin-input" maxlength="4" placeholder="••••">
-        <div style="display:flex; gap:15px; margin-top: 10px;">
-            <button class="btn pixel-text" style="flex:1; background:#e74c3c; color:white; padding:15px;" onclick="closePinModal()">BATAL</button>
-            <button class="btn pixel-text" style="flex:1; background:#2ecc71; padding:15px;" onclick="verifyGuruPin()">MASUK</button>
+        <div style="display:flex; gap:12px; margin-top: 10px;">
+            <button class="btn pixel-text" style="flex:1; background:#e74c3c; color:white; padding:12px;" onclick="closePinModal()">BATAL</button>
+            <button class="btn pixel-text" style="flex:1; background:#2ecc71; padding:12px;" onclick="verifyGuruPin()">MASUK</button>
         </div>
     </div>
 </div>
