@@ -5,12 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ular Tangga Sorting Algorithm</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
-    
-    <!-- SCRIPT FIREBASE & TONE JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
     <style>
         :root {
             --bg-color: #d4f1f9; --border-dark: #1e272e;
@@ -19,14 +14,12 @@
             --panel-bg: #f5f6fa;
         }
         * { box-sizing: border-box; }
-        
         body {
             margin: 0; padding: 20px 30px; background-color: var(--bg-color);
             background-image: linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px),
             linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px);
             background-size: 20px 20px; font-family: 'Nunito', sans-serif; 
-            display: flex; flex-direction: column; gap: 20px; 
-            min-height: 100vh; overflow-x: hidden; 
+            display: flex; flex-direction: column; gap: 20px; height: 100vh; overflow: hidden;
         }
 
         .pixel-text { font-family: 'Press Start 2P', cursive; }
@@ -35,12 +28,16 @@
         .game-title {
             text-align: center; margin: 5px 0 10px 0;
             font-size: clamp(18px, 2.5vw, 28px); letter-spacing: 3px;
+            
+            /* Animasi Warna & Bayangan */
             background: linear-gradient(90deg, #e74c3c, #f1c40f, #2ecc71, #3498db, #9b59b6, #e74c3c);
             background-size: 200% auto;
             color: transparent;
             -webkit-background-clip: text;
             background-clip: text;
             text-shadow: 3px 3px 0px rgba(30,39,46,0.2);
+            
+            /* Animasi Gerak */
             animation: shine 4s linear infinite, floatTitle 3s ease-in-out infinite;
         }
         @keyframes shine { to { background-position: 200% center; } }
@@ -51,7 +48,7 @@
 
         /* --- MAIN LAYOUT --- */
         .main-container {
-            display: flex; flex-direction: row; gap: 30px; flex: 1;
+            display: flex; flex-direction: row; gap: 30px; flex: 1; min-height: 0;
         }
         
         /* --- KIRI: AREA GAME --- */
@@ -60,7 +57,7 @@
             gap: 20px; min-width: 0;
         }
         
-        /* --- TOP BAR --- */
+        /* --- TOP BAR (RENTANG PENUH KIRI KE KANAN) --- */
         .top-bar {
             width: 100%; display: flex; justify-content: space-between; align-items: center; 
             background: white; padding: 15px 25px; border-radius: 12px;
@@ -92,6 +89,7 @@
             font-size: 13px; font-weight: 900; color: #57606f; white-space: nowrap; border: 2px solid #dfe4ea;
         }
 
+        /* Group Aksi Guru (Satu Baris) */
         .guru-actions { display: flex; gap: 12px; align-items: center; }
         
         .btn-guru-inline {
@@ -106,18 +104,15 @@
         .btn-guru-inline.bg-purple { background: var(--btn-purple); color: white; }
         .btn-guru-inline.bg-red { background: #c0392b; color: white; }
 
-        /* --- KANAN: PANEL KONTROL MURID (STICKY) --- */
+        /* --- KANAN: PANEL KONTROL MURID --- */
         #right-col {
             flex: 0 0 380px; background: var(--panel-bg);
             border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            display: flex; flex-direction: column; 
-            border: 4px solid var(--border-dark); 
-            height: calc(100vh - 40px); position: sticky; top: 20px; 
+            display: flex; flex-direction: column; overflow-y: auto;
+            border: 4px solid var(--border-dark); height: 100%;
         }
 
-        .panel-scroll-area { overflow-y: auto; flex: 1; padding: 25px; }
-        .panel-section { border-bottom: 4px solid var(--border-dark); padding-bottom: 25px; margin-bottom: 25px;}
-        .panel-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0;}
+        .panel-section { padding: 25px; border-bottom: 4px solid var(--border-dark); }
         
         .player-card {
             background: white; border: 4px solid var(--border-dark); border-radius: 10px;
@@ -145,7 +140,10 @@
             50% { transform: rotate(180deg) scale(1.2); background-color: var(--btn-yellow); }
             100% { transform: rotate(360deg) scale(1); background-color: white; }
         }
-        .rolling-dice { animation: spinDice3D 0.2s infinite linear !important; color: var(--border-dark); }
+        .rolling-dice {
+            animation: spinDice3D 0.2s infinite linear !important;
+            color: var(--border-dark);
+        }
         
         .btn {
             border: 4px solid var(--border-dark); border-radius: 8px;
@@ -163,6 +161,7 @@
             border-radius: 8px; font-size: 15px; font-weight: bold; font-family: inherit; outline: none;
         }
 
+        /* --- KLASEMEN & PAPAN --- */
         .leaderboard-header {
             background: var(--border-dark); color: white; text-align: center;
             padding: 15px; font-size: 13px; border-radius: 6px; margin-bottom: 20px; letter-spacing: 1px;
@@ -176,11 +175,15 @@
         .lb-item p { margin: 0; font-size: 12px; color: #2980b9; font-weight: bold; }
         .lb-rank { font-size: 14px; color: #7f8c8d; font-weight: bold; width: 25px;}
 
-        /* --- PAPAN RAKSASA: LEBAR 100% MENGIKUTI TOP BAR --- */
+        /* PERBAIKAN PAPAN AGAR LEBIH BESAR SEJAJAR DENGAN TOP BAR */
         #board-wrapper {
-            position: relative; width: 100%; height: auto; aspect-ratio: 1 / 1; 
+            position: relative; 
+            width: 100%; /* Memaksa papan selebar top bar */
+            height: auto; 
+            aspect-ratio: 1 / 1; 
+            max-height: calc(100vh - 180px); /* Menjaga agar tidak terpotong bagian bawah layar */
             border: 8px solid var(--border-dark); border-radius: 8px;
-            box-shadow: 8px 8px 0px rgba(0,0,0,0.15); background: white; margin: 0;
+            box-shadow: 8px 8px 0px rgba(0,0,0,0.15); background: white; margin: 0 auto;
         }
         #board {
             width: 100%; height: 100%; display: grid; 
@@ -197,7 +200,8 @@
         .cell:nth-child(7n) { background-color: #ecf0f1; color: black;}
 
         #svg-layer {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            pointer-events: none; z-index: 5;
         }
 
         .player-token {
@@ -219,7 +223,7 @@
         }
         .cell:hover .cell-tooltip { opacity: 1; visibility: visible; }
 
-        /* --- MODAL --- */
+        /* --- MODAL (SOAL, HASIL, PIN) --- */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(30,39,46,0.9); z-index: 100; justify-content: center; align-items: center;
@@ -250,24 +254,19 @@
         @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         @keyframes shakeAlert {
             0% { transform: translate(1px, 1px) rotate(0deg); }
-            10% { transform: translate(-1px, -2px) rotate(-1deg); }
             20% { transform: translate(-3px, 0px) rotate(1deg); }
-            30% { transform: translate(3px, 2px) rotate(0deg); }
             40% { transform: translate(1px, -1px) rotate(1deg); }
-            50% { transform: translate(-1px, 2px) rotate(-1deg); }
             60% { transform: translate(-3px, 1px) rotate(0deg); }
-            70% { transform: translate(3px, 1px) rotate(-1deg); }
             80% { transform: translate(-1px, -1px) rotate(1deg); }
-            90% { transform: translate(1px, 2px) rotate(0deg); }
             100% { transform: translate(1px, -2px) rotate(-1deg); }
         }
         .shake-anim { animation: shakeAlert 0.4s !important; }
 
         @media (max-width: 1024px) {
-            .main-container { flex-direction: column; overflow-y: visible; }
+            .main-container { flex-direction: column; overflow-y: auto; }
             #left-col, #right-col { width: 100%; flex: none; max-width: 100%; height: auto;}
-            #board-wrapper { max-width: 100%; height: auto; margin-bottom: 20px;}
-            #right-col { position: relative; height: auto; top: 0;}
+            #board-wrapper { max-width: 90vw; max-height: 90vw; }
+            body { height: auto; }
         }
         @media (max-width: 768px) {
             .top-bar { flex-direction: column; align-items: stretch; gap: 15px;}
@@ -297,6 +296,7 @@
                 <span class="badge">Pemain: <b id="player-count-num" style="color:#0984e3; font-size:16px;">0/44</b></span>
             </div>
 
+            <!-- TOMBOL GURU SEBARIS (INLINE) -->
             <div class="guru-actions">
                 <button id="btn-music" class="btn-guru-inline bg-yellow pixel-text">🔊 Musik ON</button>
                 <button onclick="askPinForAction('download_csv')" class="btn-guru-inline bg-purple pixel-text">📥 Unduh CSV</button>
@@ -311,14 +311,14 @@
     </div>
 
     <div id="right-col">
-        <div class="panel-scroll-area">
-            <div id="join-section" class="panel-section">
-                <h3 class="pixel-text" style="font-size: 14px; text-align: center; margin-bottom:25px; color:#2c3e50; line-height: 1.5;">GABUNG BALAPAN!</h3>
-                <input type="text" id="player-name" placeholder="Ketik namamu di sini..." style="margin-bottom: 20px;">
-                <button class="btn pixel-text" onclick="joinGame()" style="width: 100%;">MASUK ARENA</button>
-            </div>
+        <div id="join-section" class="panel-section">
+            <h3 class="pixel-text" style="font-size: 14px; text-align: center; margin-bottom:25px; color:#2c3e50; line-height: 1.5;">GABUNG BALAPAN!</h3>
+            <input type="text" id="player-name" placeholder="Ketik namamu di sini..." style="margin-bottom: 20px;">
+            <button class="btn pixel-text" onclick="joinGame()" style="width: 100%;">MASUK ARENA</button>
+        </div>
 
-            <div id="play-section" class="panel-section" style="display: none;">
+        <div id="play-section" style="display: none;">
+            <div class="panel-section">
                 <div class="player-card">
                     <div class="avatar-box" id="my-avatar">🦊</div>
                     <div class="player-info">
@@ -335,11 +335,11 @@
                 </div>
                 <p class="rules-text">Jawab benar = Maju. Jawab salah = Dadu Hangus.<br>Kotak Finish terkunci jika misi belum tuntas!</p>
             </div>
+        </div>
 
-            <div class="panel-section" style="flex-grow: 1; border-bottom: none;">
-                <div class="leaderboard-header pixel-text">🏆 PAPAN PERINGKAT</div>
-                <div id="lb-list"></div>
-            </div>
+        <div class="panel-section" style="flex-grow: 1; border-bottom: none;">
+            <div class="leaderboard-header pixel-text">🏆 PAPAN PERINGKAT</div>
+            <div id="lb-list"></div>
         </div>
     </div>
 </div>
@@ -377,35 +377,6 @@
 </div>
 
 <script>
-    // =========================================================================
-    // 1. INISIALISASI FIREBASE
-    // =========================================================================
-    const firebaseConfig = {
-        apiKey: "AIzaSyDg0uL5NE32rLW3zUHCz0RFxR4pC_aiw_Y",
-        authDomain: "ular-tangga-kelas.firebaseapp.com",
-        projectId: "ular-tangga-kelas",
-        storageBucket: "ular-tangga-kelas.firebasestorage.app",
-        messagingSenderId: "371215021153",
-        appId: "1:371215021153:web:cfe21b5c4bb49cb9eea620",
-        measurementId: "G-RWVMMHVCK4",
-        // TAMBAHAN URL DATABASE WAJIB UNTUK SERVER ASIA (SINGAPORE)
-        databaseURL: "https://ular-tangga-kelas-default-rtdb.asia-southeast1.firebasedatabase.app" 
-        /* CATATAN: Jika ternyata map tidak muncul saat online, ubah link di atas menjadi:
-           databaseURL: "https://ular-tangga-kelas-default-rtdb.firebaseio.com" */
-    };
-
-    let db, gameRef;
-    if (firebaseConfig.apiKey) {
-        firebase.initializeApp(firebaseConfig);
-        db = firebase.database();
-        gameRef = db.ref('ularTanggaKelas');
-    } else {
-        alert("PENTING: Firebase gagal memuat.");
-    }
-
-    // =========================================================================
-    // 2. DATA PERMAINAN & BANK SOAL
-    // =========================================================================
     const bankSoal = [
         { q: "Sebuah algoritma sorting bekerja dengan mengambil satu data, kemudian memasukkannya ke posisi yang sesuai pada bagian data yang sudah terurut. Algoritma yang memiliki cara kerja tersebut adalah ...", opt: ["Bubble Sort", "Selection Sort", "Insertion Sort", "Searching"], ans: 2 },
         { q: "Algoritma yang bekerja dengan mencari nilai terkecil dari bagian data yang belum terurut kemudian menempatkannya pada posisi yang sesuai adalah ...", opt: ["Insertion Sort", "Selection Sort", "Bubble Sort", "Linear Search"], ans: 1 },
@@ -426,12 +397,14 @@
 
     const avatars = ["🦊", "🐱", "🐶", "🐼", "🐨", "🦁", "🐯", "🐸", "🐙", "🐧", "🦖", "🦄", "🐵", "🐥"];
     let myId = localStorage.getItem('sortingRaceMyId') || null; 
-    let players = {};
+    let players = JSON.parse(localStorage.getItem('sortingRaceData')) || {};
+    
     let currentDice = 0;
     let onResultClosed = null;
     let currentActiveQuestionIndex = null;
     let pendingGuruAction = null;
-    let timerData = { remaining: 900, isRunning: false, endTime: 0 };
+    
+    let timerData = JSON.parse(localStorage.getItem('sortingRaceTimerData')) || { remaining: 900, isRunning: false, endTime: 0 };
     let timerInterval = null;
 
     let isMusicPlaying = false;
@@ -442,44 +415,6 @@
     const ladders = { 2: 38, 21: 42, 33: 68, 51: 89, 71: 91 };
     const snakes = { 24: 7, 58: 36, 73: 47, 85: 64, 98: 79 };
 
-    // =========================================================================
-    // 3. SINKRONISASI DATA DENGAN FIREBASE (REAL-TIME)
-    // =========================================================================
-    if (gameRef) {
-        gameRef.child('players').on('value', (snapshot) => {
-            players = snapshot.val() || {};
-            
-            if (myId && players[myId]) {
-                document.getElementById('join-section').style.display = 'none';
-                document.getElementById('play-section').style.display = 'block';
-                document.getElementById('my-name').innerText = players[myId].name.toUpperCase();
-                document.getElementById('my-avatar').innerText = players[myId].ava;
-                document.getElementById('current-pos').innerText = players[myId].pos;
-            } else if (myId && !players[myId]) {
-                localStorage.removeItem('sortingRaceMyId');
-                location.reload();
-            }
-            updateBoard();
-        });
-
-        gameRef.child('timer').on('value', (snapshot) => {
-            let newData = snapshot.val();
-            if (newData) {
-                let wasRunning = timerData.isRunning;
-                timerData = newData;
-                if (timerData.isRunning && !wasRunning) runTimerLoop();
-                else if (!timerData.isRunning) { clearInterval(timerInterval); renderTimer(); }
-            }
-        });
-    }
-
-    function saveGameState() { if(gameRef) gameRef.child('players').set(players); }
-    function saveTimerState() { if(gameRef) gameRef.child('timer').set(timerData); }
-
-
-    // =========================================================================
-    // 4. LOGIKA PERMAINAN
-    // =========================================================================
     function getCellCoord(cellNum) {
         let zeroIndex = cellNum - 1; 
         let rowFromBottom = Math.floor(zeroIndex / 10); 
@@ -501,7 +436,15 @@
         }
         board.innerHTML = html;
         drawSnakesAndLadders();
-        renderTimer(); 
+        
+        if (myId && players[myId]) {
+            document.getElementById('join-section').style.display = 'none';
+            document.getElementById('play-section').style.display = 'block';
+            document.getElementById('my-name').innerText = players[myId].name.toUpperCase();
+            document.getElementById('my-avatar').innerText = players[myId].ava;
+            document.getElementById('current-pos').innerText = players[myId].pos;
+        }
+        updateBoard();
     }
 
     function drawSnakesAndLadders() {
@@ -577,6 +520,7 @@
         } else if (action === 'download_csv') {
             let d = new Date();
             let dStr = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
+            
             let csv = "Nama,Karakter,Status,Posisi,Soal Benar,Dadu Hangus (Salah),Giliran Total,Skor Akurasi,Waktu Mulai,Waktu Selesai,Total Waktu (Detik)\n";
             
             Object.values(players).forEach(p => { 
@@ -600,10 +544,8 @@
             let url = window.URL.createObjectURL(blob);
             let a = document.createElement('a'); a.href = url; a.download = `Hasil_UlarTangga_Sorting_${dStr}.csv`; a.click();
         } else if (action === 'delete_data') {
-            if(confirm("Yakin ingin menghapus seluruh jejak pemain di database Firebase?")) {
-                if(gameRef) gameRef.remove(); 
-                localStorage.removeItem('sortingRaceMyId'); 
-                location.reload();
+            if(confirm("Yakin ingin menghapus seluruh jejak pemain? (Aksi ini tidak bisa dibatalkan)")) {
+                localStorage.clear(); sessionStorage.clear(); location.reload();
             }
         }
     }
@@ -613,8 +555,11 @@
         let s = Math.floor(timerData.remaining % 60);
         document.getElementById('timer-display').innerHTML = `<span style="font-size:12px;">⏱</span> ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
         
-        if (timerData.isRunning && timerData.remaining > 0) { unlockDice(); } else { lockDice(); }
+        if (timerData.isRunning && timerData.remaining > 0) unlockDice();
+        else lockDice();
     }
+
+    function saveTimerState() { localStorage.setItem('sortingRaceTimerData', JSON.stringify(timerData)); }
 
     function runTimerLoop() {
         clearInterval(timerInterval);
@@ -662,6 +607,7 @@
         if(isShake) { box.classList.add('shake-anim'); setTimeout(() => box.classList.remove('shake-anim'), 500); }
         
         document.getElementById('result-modal').style.display = 'flex';
+        
         onResultClosed = callbackParam;
     }
 
@@ -677,7 +623,6 @@
     function joinGame() {
         const name = document.getElementById('player-name').value.trim();
         if (!name) return showCustomResult("⚠️", "HEI!", "Ketik namamu dulu sebelum bermain.", "var(--btn-red)", true, null);
-        if (!gameRef) return alert("Firebase belum dikonfigurasi. Anda tidak bisa bergabung ke server.");
         
         myId = 'player_' + Math.random().toString(36).substr(2, 9);
         let myAva = avatars[Math.floor(Math.random() * avatars.length)];
@@ -692,8 +637,14 @@
             startTime: joinTime, finishTime: null
         };
         
-        localStorage.setItem('sortingRaceMyId', myId); 
-        saveGameState(); 
+        sessionStorage.setItem('sortingRaceMyId', myId); saveGameState();
+        
+        document.getElementById('join-section').style.display = 'none';
+        document.getElementById('play-section').style.display = 'block';
+        document.getElementById('my-name').innerText = name.toUpperCase();
+        document.getElementById('my-avatar').innerText = myAva;
+        
+        updateBoard(); renderTimer(); 
     }
 
     function playDiceSound() {
@@ -792,7 +743,10 @@
             }
             
             let executeAfterClose = () => { 
+                document.getElementById('current-pos').innerText = p.pos; 
                 saveGameState(); 
+                updateBoard(); 
+                renderTimer(); 
             };
             
             showCustomResult(icon, finalTitle, msg, btnColor, false, executeAfterClose);
@@ -809,6 +763,8 @@
             
             let executeAfterClose = () => { 
                 saveGameState(); 
+                updateBoard(); 
+                renderTimer(); 
             };
             
             showCustomResult("❌", "YAH SALAH!", "Cara kerja algoritma kurang tepat.<br>Dadu hangus, kamu tidak bergerak giliran ini.", "var(--btn-red)", true, executeAfterClose);
@@ -888,6 +844,20 @@
         document.getElementById('player-count-num').innerText = `${Object.keys(players).length}/44`;
     }
 
+    function saveGameState() { localStorage.setItem('sortingRaceData', JSON.stringify(players)); }
+    
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'sortingRaceData') { players = JSON.parse(e.newValue) || {}; updateBoard(); }
+        if (e.key === 'sortingRaceTimerData') {
+            let newData = JSON.parse(e.newValue);
+            if (newData) {
+                let wasRunning = timerData.isRunning; timerData = newData;
+                if (timerData.isRunning && !wasRunning) runTimerLoop();
+                else if (!timerData.isRunning) { clearInterval(timerInterval); renderTimer(); }
+            }
+        }
+    });
+
     document.getElementById('btn-music').addEventListener('click', async () => {
         if (!isMusicPlaying) {
             await Tone.start(); Tone.Transport.bpm.value = 160; melody.start(0); Tone.Transport.start();
@@ -904,7 +874,7 @@
         }
     });
 
-    window.onload = () => { createBoard(); };
+    window.onload = () => { createBoard(); renderTimer(); if (timerData.isRunning) runTimerLoop(); };
 </script>
 </body>
 </html>
