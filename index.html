@@ -24,19 +24,21 @@
 
         .pixel-text { font-family: 'Press Start 2P', cursive; }
         
+        /* --- KIRI: AREA GAME --- */
         #left-col {
             flex: 1; display: flex; flex-direction: column; align-items: center; 
             justify-content: center; gap: 15px; height: 100%; min-width: 0;
         }
         
+        /* PERBAIKAN TOP BAR AGAR RAPI MENYEBAR KE KANAN & KIRI */
         .top-bar {
-            width: 100%; max-width: 75vh;
-            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
+            width: 100%; /* Dibuat merentang penuh agar tidak menumpuk */
+            display: flex; justify-content: space-between; align-items: center; gap: 15px;
             background: white; padding: 15px 20px; border-radius: 12px;
             border: 4px solid var(--border-dark);
         }
         
-        .top-left-group { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .top-left-group { display: flex; align-items: center; gap: 12px; }
         
         .timer-box {
             background: #e84118; color: white; padding: 10px 15px;
@@ -61,6 +63,7 @@
             font-size: 12px; font-weight: 900; color: #57606f; white-space: nowrap;
         }
 
+        /* Group Aksi Guru Kanan */
         .guru-actions { display: flex; gap: 10px; align-items: stretch; }
         
         .btn-guru-tall {
@@ -170,7 +173,7 @@
         .cell {
             border: 1px solid rgba(0,0,0,0.3); display: flex; padding: 4px; 
             font-weight: 900; font-size: clamp(10px, 1.5vmin, 14px);
-            position: relative; /* Penting untuk Tooltip Kotak */
+            position: relative; 
         }
         .cell:nth-child(even) { background-color: #f1c40f; color: black; }
         .cell:nth-child(odd) { background-color: #e74c3c; color: white;}
@@ -189,7 +192,7 @@
             z-index: 10; transform: translate(-50%, -50%); display: flex; 
             justify-content: center; align-items: center; font-size: clamp(14px, 2vmin, 20px);
             background: white; border-radius: 50%; border: 3px solid var(--border-dark);
-            box-shadow: 2px 2px 0px rgba(0,0,0,0.3); pointer-events: none; /* Tooltip pindah ke kotak */
+            box-shadow: 2px 2px 0px rgba(0,0,0,0.3); pointer-events: none; 
         }
 
         /* TOOLTIP KOTAK (Menampilkan Nama Pemain Tergabung) */
@@ -495,7 +498,6 @@
         } else if (action === 'download_csv') {
             let d = new Date();
             let dStr = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
-            
             let csv = "Nama,Karakter,Status,Posisi,Soal Benar,Dadu Hangus (Salah),Giliran Total,Skor Akurasi,Waktu Mulai,Waktu Selesai,Total Waktu (Detik)\n";
             
             Object.values(players).forEach(p => { 
@@ -749,16 +751,13 @@
         }
     }
 
-    // --- LOGIKA PENYEBARAN PION BERTUMPUK (RADIAL OFFSET) ---
     function updateBoard() {
         document.querySelectorAll('.player-token').forEach(t => t.remove());
-        // Bersihkan tooltip lama dari kotak
         document.querySelectorAll('.cell-tooltip').forEach(t => t.remove());
         
         const lbList = document.getElementById('lb-list');
         lbList.innerHTML = '';
         
-        // Kelompokkan pemain berdasarkan posisi kotak
         let playersByPos = {};
         let sortedPlayers = Object.values(players).sort((a, b) => b.pos - a.pos);
 
@@ -767,7 +766,6 @@
             playersByPos[p.pos].push(p);
         });
 
-        // Gambar pion dan atur offset jika bertumpuk
         for (let pos in playersByPos) {
             let group = playersByPos[pos];
             let cellCoord = getCellCoord(pos);
@@ -780,15 +778,11 @@
 
                 let offsetX = 0; let offsetY = 0;
                 
-                // Jika lebih dari 1 orang di kotak yang sama, sebar melingkar
                 if (totalInCell > 1) {
                     let angle = (i / totalInCell) * (2 * Math.PI);
-                    // Radius sebaran 3% dari ukuran cell (bisa disesuaikan)
                     let radius = 2.5; 
                     offsetX = Math.cos(angle) * radius;
                     offsetY = Math.sin(angle) * radius;
-                    
-                    // Supaya yang menumpuk ukurannya sedikit lebih kecil agar muat
                     token.style.transform = `translate(-50%, -50%) scale(0.85)`;
                 }
 
@@ -797,9 +791,8 @@
                 document.getElementById('board-wrapper').appendChild(token);
             });
 
-            // --- TOOLTIP KOTAK (BATAS MAKS 3 NAMA) ---
             if (pos > 0) {
-                let cellId = (pos % 10 === 0 && Math.floor((pos-1)/10) % 2 !== 0) ? pos : pos; // mencari id cell HTML
+                let cellId = (pos % 10 === 0 && Math.floor((pos-1)/10) % 2 !== 0) ? pos : pos; 
                 let cellElem = document.getElementById(`cell-${pos}`);
                 if(cellElem) {
                     let tooltip = document.createElement('div');
@@ -816,7 +809,6 @@
             }
         }
 
-        // Render Klasemen
         sortedPlayers.forEach((p, idx) => {
             lbList.innerHTML += `
                 <div class="lb-item">
@@ -834,7 +826,6 @@
 
     function saveGameState() { localStorage.setItem('sortingRaceData', JSON.stringify(players)); }
     
-    // Sinkronisasi Multi-Tab
     window.addEventListener('storage', (e) => {
         if (e.key === 'sortingRaceData') { players = JSON.parse(e.newValue) || {}; updateBoard(); }
         if (e.key === 'sortingRaceTimerData') {
