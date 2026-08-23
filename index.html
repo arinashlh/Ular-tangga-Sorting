@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ular Tangga Sorting Algorithm</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <style>
+        :root {
+            --bg-color: #d4f1f9; --border-dark: #1e272e;
+            --btn-yellow: #f1c40f; --btn-purple: #5f27cd;
+            --btn-green: #2ecc71; --btn-red: #e74c3c;
+            --panel-bg: #f5f6fa;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; padding: 20px; background-color: var(--bg-color);
+            background-image: linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px);
+            background-size: 20px 20px; font-family: 'Nunito', sans-serif; 
+            display: flex; flex-direction: row; gap: 20px; height: 100vh; overflow: hidden;
+        }
+
+        .pixel-text { font-family: 'Press Start 2P', cursive; }
+        
+        #left-col {
+            flex: 1; display: flex; flex-direction: column; align-items: center; 
+            justify-content: center; gap: 15px; height: 100%; min-width: 0;
+        }
+        
+        .top-bar {
+            width: 100%; max-width: 75vh;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
+            background: white; padding: 15px 20px; border-radius: 12px;
+            border: 4px solid var(--border-dark);
+        }
+        
+        .top-left-group { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        
+        .timer-box {
+            background: #e84118; color: white; padding: 10px 15px;
+            border-radius: 8px; font-size: 16px; border: 4px solid var(--border-dark);
+            box-shadow: 4px 4px 0px var(--border-dark); display: flex; align-items: center; gap: 8px;
+        }
+
+        .timer-controls { display: flex; gap: 8px; }
+        
+        .btn-mini {
+            width: 42px; height: 42px; padding: 0; display: flex; justify-content: center; align-items: center;
+            font-size: 12px; border: 4px solid var(--border-dark); box-shadow: 4px 4px 0px var(--border-dark);
+            border-radius: 8px; cursor: pointer; color: var(--border-dark); transition: 0.1s;
+        }
+        .btn-mini:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
+        .btn-mini.bg-green { background: #2ecc71; }
+        .btn-mini.bg-yellow { background: #f1c40f; }
+        .btn-mini.bg-red { background: #e74c3c; color: white;}
+
+        .badge {
+            background: #f1f2f6; padding: 8px 15px; border-radius: 20px;
+            font-size: 12px; font-weight: 900; color: #57606f; white-space: nowrap;
+        }
+
+        .guru-actions { display: flex; gap: 10px; align-items: stretch; }
+        
+        .btn-guru-tall {
+            background: var(--btn-yellow); color: var(--border-dark);
+            border: 4px solid var(--border-dark); border-radius: 8px;
+            font-size: 10px; font-family: 'Press Start 2P', cursive;
+            cursor: pointer; box-shadow: 4px 4px 0px var(--border-dark);
+            transition: all 0.1s; text-align: center; line-height: 1.6;
+            padding: 10px 15px; display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .btn-guru-tall:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
+        
+        .btn-guru-stack { display: flex; flex-direction: column; gap: 8px; }
+        
+        .btn-guru-small {
+            border: 4px solid var(--border-dark); border-radius: 8px;
+            font-size: 9px; font-family: 'Press Start 2P', cursive;
+            cursor: pointer; box-shadow: 4px 4px 0px var(--border-dark);
+            transition: all 0.1s; text-align: left; color: white;
+            padding: 8px 12px; flex: 1; display: flex; align-items: center; gap: 8px;
+        }
+        .btn-guru-small:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
+        .btn-guru-small.bg-purple { background: var(--btn-purple); }
+        .btn-guru-small.bg-red { background: #c0392b; }
+
+        /* --- KANAN: PANEL KONTROL MURID --- */
+        #right-col {
+            flex: 0 0 360px; background: var(--panel-bg);
+            border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; overflow-y: auto;
+            border: 4px solid var(--border-dark);
+        }
+
+        .panel-section { padding: 20px; border-bottom: 4px solid var(--border-dark); }
+        
+        .player-card {
+            background: white; border: 4px solid var(--border-dark); border-radius: 10px;
+            padding: 15px; display: flex; align-items: center; gap: 15px;
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
+        }
+        .avatar-box {
+            width: 50px; height: 50px; background: #dfe4ea; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center; font-size: 30px;
+            border: 2px solid #ced6e0;
+        }
+        .player-info h3 { margin: 0 0 5px 0; font-size: 14px; color: var(--border-dark); }
+        .player-info p { margin: 0; font-size: 12px; color: #747d8c; font-weight: 900;}
+        .player-info b { font-size: 16px; color: #2980b9; }
+
+        .dice-area { display: flex; align-items: center; gap: 15px; margin-top: 20px; }
+        .dice-icon {
+            width: 60px; height: 60px; background: white; border: 4px solid var(--border-dark);
+            border-radius: 8px; display: flex; justify-content: center; align-items: center;
+            font-size: 28px; box-shadow: 4px 4px 0px var(--border-dark); transition: transform 0.1s;
+        }
+        
+        @keyframes spinDice3D {
+            0% { transform: rotate(0deg) scale(1); background-color: white; }
+            50% { transform: rotate(180deg) scale(1.2); background-color: var(--btn-yellow); }
+            100% { transform: rotate(360deg) scale(1); background-color: white; }
+        }
+        .rolling-dice {
+            animation: spinDice3D 0.2s infinite linear !important;
+            color: var(--border-dark);
+        }
+        
+        .btn {
+            border: 4px solid var(--border-dark); border-radius: 8px;
+            padding: 15px; font-size: 14px; cursor: pointer;
+            box-shadow: 4px 4px 0px var(--border-dark); transition: all 0.1s; 
+            text-align: center; color: var(--border-dark); line-height: 1.5; background: var(--btn-green);
+        }
+        .btn:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--border-dark); }
+        .btn:disabled { filter: grayscale(100%); cursor: not-allowed; transform: none; box-shadow: none; opacity: 0.7;}
+        
+        .rules-text { font-size: 10px; color: #57606f; font-weight: 900; margin-top: 15px; text-align: center; line-height:1.5;}
+
+        #join-section input {
+            width: 100%; padding: 15px; border: 4px solid var(--border-dark);
+            border-radius: 8px; font-size: 14px; font-weight: bold; font-family: inherit; outline: none;
+        }
+
+        /* --- KLASEMEN & PAPAN --- */
+        .leaderboard-header {
+            background: var(--border-dark); color: white; text-align: center;
+            padding: 12px; font-size: 12px; border-radius: 4px; margin-bottom: 15px;
+        }
+        .lb-item {
+            border: 3px solid var(--border-dark); border-radius: 8px;
+            padding: 10px 15px; display: flex; align-items: center; gap: 10px;
+            margin-bottom: 10px; background: #e3f2fd;
+        }
+        .lb-item h4 { margin: 0 0 4px 0; font-size: 12px; color: var(--border-dark); line-height: 1.3;}
+        .lb-item p { margin: 0; font-size: 11px; color: #2980b9; font-weight: bold; }
+        .lb-rank { font-size: 12px; color: #7f8c8d; font-weight: bold; width: 20px;}
+
+        #board-wrapper {
+            position: relative; width: 100%; height: auto;
+            aspect-ratio: 1 / 1; max-height: 70vh; max-width: 70vh; 
+            border: 8px solid var(--border-dark); border-radius: 4px;
+            box-shadow: 8px 8px 0px rgba(0,0,0,0.15); background: white; margin: 0 auto;
+        }
+        #board {
+            width: 100%; height: 100%; display: grid; 
+            grid-template-columns: repeat(10, 1fr); grid-template-rows: repeat(10, 1fr);
+        }
+        .cell {
+            border: 1px solid rgba(0,0,0,0.3); display: flex; padding: 4px; 
+            font-weight: 900; font-size: clamp(10px, 1.5vmin, 14px);
+            position: relative; /* Penting untuk Tooltip Kotak */
+        }
+        .cell:nth-child(even) { background-color: #f1c40f; color: black; }
+        .cell:nth-child(odd) { background-color: #e74c3c; color: white;}
+        .cell:nth-child(3n) { background-color: #3498db; color: white;}
+        .cell:nth-child(5n) { background-color: #2ecc71; color: black;}
+        .cell:nth-child(7n) { background-color: #ecf0f1; color: black;}
+
+        #svg-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            pointer-events: none; z-index: 5;
+        }
+
+        .player-token {
+            width: clamp(20px, 3.5vmin, 32px); height: clamp(20px, 3.5vmin, 32px);
+            position: absolute; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 10; transform: translate(-50%, -50%); display: flex; 
+            justify-content: center; align-items: center; font-size: clamp(14px, 2vmin, 20px);
+            background: white; border-radius: 50%; border: 3px solid var(--border-dark);
+            box-shadow: 2px 2px 0px rgba(0,0,0,0.3); pointer-events: none; /* Tooltip pindah ke kotak */
+        }
+
+        /* TOOLTIP KOTAK (Menampilkan Nama Pemain Tergabung) */
+        .cell-tooltip {
+            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+            background: var(--border-dark); color: white; padding: 6px 10px; border-radius: 6px; 
+            font-family: 'Press Start 2P', cursive; font-size: 8px; white-space: nowrap; 
+            opacity: 0; visibility: hidden; transition: 0.2s; pointer-events: none; 
+            z-index: 100; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            text-align: center; line-height: 1.5;
+        }
+        .cell:hover .cell-tooltip { opacity: 1; visibility: visible; }
+
+        /* --- MODAL (SOAL, HASIL, PIN) --- */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(30,39,46,0.9); z-index: 100; justify-content: center; align-items: center;
+        }
+        .modal-content {
+            background: white; padding: 30px; border-radius: 12px; border: 6px solid var(--border-dark);
+            width: 90%; max-width: 500px; box-shadow: 8px 8px 0px rgba(0,0,0,0.5);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); max-height: 90vh; overflow-y: auto;
+        }
+        .option-btn {
+            display: block; width: 100%; padding: 15px; margin: 10px 0; border: 3px solid var(--border-dark);
+            background: white; cursor: pointer; text-align: left; font-family: inherit;
+            border-radius: 8px; font-weight: 900; font-size: 14px; transition: 0.1s;
+        }
+        .option-btn:hover { background: #f1f2f6; transform: translateX(5px); box-shadow: -4px 4px 0px var(--border-dark); }
+        
+        .result-box { text-align: center; max-width: 400px; }
+        .result-box h2 { font-size: 20px; margin-bottom: 15px; line-height: 1.5; }
+        .result-box p { font-size: 14px; font-weight: bold; color: #57606f; line-height: 1.6; margin-bottom: 25px; }
+        .result-icon { font-size: 50px; margin-bottom: 15px; display: block; }
+        
+        .pin-input {
+            width: 100%; padding: 12px; font-size: 24px; border: 3px solid var(--border-dark);
+            border-radius: 6px; margin: 15px 0; text-align: center; font-family: inherit; outline: none;
+            letter-spacing: 8px;
+        }
+
+        @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes shakeAlert {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+        .shake-anim { animation: shakeAlert 0.4s !important; }
+
+        @media (max-width: 900px) {
+            body { flex-direction: column; overflow-y: auto; height: auto; }
+            #left-col, #right-col { width: 100%; flex: none; max-width: 100%; }
+            #board-wrapper { max-width: 95vw; max-height: 95vw; }
+            .top-bar { max-width: 100%; flex-direction: column; align-items: flex-start; gap: 15px;}
+            .top-left-group, .guru-actions { justify-content: center; width: 100%;}
+        }
+    </style>
+</head>
+<body>
+
+<div id="left-col">
+    <div class="top-bar">
+        <div class="top-left-group">
+            <div class="timer-box pixel-text" id="timer-display">
+                <span style="font-size:12px;">⏱</span> 15:00
+            </div>
+            <div class="timer-controls">
+                <button onclick="askPinForAction('timer_start')" title="Mulai Waktu" class="btn-mini bg-green pixel-text">▶</button>
+                <button onclick="askPinForAction('timer_pause')" title="Jeda Waktu" class="btn-mini bg-yellow pixel-text">⏸</button>
+                <button onclick="askPinForAction('timer_reset')" title="Reset Waktu" class="btn-mini bg-red pixel-text">🔄</button>
+            </div>
+            <span class="badge">Pemain: <b id="player-count-num" style="color:#0984e3; font-size:14px;">0/44</b></span>
+        </div>
+
+        <div class="guru-actions">
+            <button id="btn-music" class="btn-guru-tall pixel-text">🔊 Musik<br><br>OFF</button>
+            <div class="btn-guru-stack">
+                <button onclick="askPinForAction('download_csv')" class="btn-guru-small bg-purple pixel-text">📥 Unduh CSV</button>
+                <button onclick="askPinForAction('delete_data')" class="btn-guru-small bg-red pixel-text">🗑️ Hapus Data</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="board-wrapper">
+        <div id="board"></div>
+        <svg id="svg-layer" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+    </div>
+</div>
+
+<div id="right-col">
+    <div id="join-section" class="panel-section">
+        <h3 class="pixel-text" style="font-size: 12px; text-align: center; margin-bottom:20px; color:#2c3e50;">GABUNG BALAPAN!</h3>
+        <input type="text" id="player-name" placeholder="Ketik namamu di sini..." style="margin-bottom: 15px;">
+        <button class="btn pixel-text" onclick="joinGame()" style="width: 100%;">GABUNG</button>
+    </div>
+
+    <div id="play-section" style="display: none;">
+        <div class="panel-section">
+            <div class="player-card">
+                <div class="avatar-box" id="my-avatar">🦊</div>
+                <div class="player-info">
+                    <h3 class="pixel-text" id="my-name">NAMA</h3>
+                    <p>Posisi: <b id="current-pos">1</b>/100</p>
+                </div>
+            </div>
+
+            <div class="dice-area">
+                <div class="dice-icon pixel-text" id="dice-result">?</div>
+                <button id="btn-roll" class="btn pixel-text" style="flex:1; background:#e74c3c; color:white;" onclick="rollDice()" disabled>
+                    TUNGGU<br>GURU
+                </button>
+            </div>
+            <p class="rules-text">Jawab benar = Maju. Jawab salah = Dadu Hangus.<br>Kotak Finish terkunci jika misi belum tuntas!</p>
+        </div>
+    </div>
+
+    <div class="panel-section" style="flex-grow: 1; border-bottom: none;">
+        <div class="leaderboard-header pixel-text">🏆 KLASEMEN BALAPAN</div>
+        <div id="lb-list"></div>
+    </div>
+</div>
+
+<!-- Modal Soal -->
+<div id="question-modal" class="modal-overlay">
+    <div class="modal-content">
+        <h3 id="q-text" style="line-height: 1.5; color:#2c3e50; margin-top:0;">Pertanyaan...</h3>
+        <div id="q-options"></div>
+    </div>
+</div>
+
+<!-- Modal Hasil Game -->
+<div id="result-modal" class="modal-overlay">
+    <div class="modal-content result-box" id="result-box-content">
+        <span class="result-icon" id="result-icon">🎯</span>
+        <h2 class="pixel-text" id="result-title">HASIL</h2>
+        <p id="result-desc">Deskripsi pergerakan.</p>
+        <button id="btn-result-close" class="btn pixel-text" style="width: 100%; font-size: 14px; padding:15px;" onclick="closeResultModal()">LANJUT</button>
+    </div>
+</div>
+
+<!-- Modal Input PIN Guru -->
+<div id="pin-modal" class="modal-overlay">
+    <div class="modal-content result-box">
+        <span class="result-icon">🔐</span>
+        <h2 class="pixel-text" style="color:#2c3e50;">AKSES GURU</h2>
+        <p>Masukkan PIN untuk melanjutkan tindakan:</p>
+        <input type="password" id="guru-pin-input" class="pin-input" maxlength="4" placeholder="••••">
+        <div style="display:flex; gap:10px;">
+            <button class="btn pixel-text" style="flex:1; background:#e74c3c; color:white; padding:12px;" onclick="closePinModal()">BATAL</button>
+            <button class="btn pixel-text" style="flex:1; background:#2ecc71; padding:12px;" onclick="verifyGuruPin()">MASUK</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const bankSoal = [
+        { q: "Sebuah algoritma sorting bekerja dengan mengambil satu data, kemudian memasukkannya ke posisi yang sesuai pada bagian data yang sudah terurut. Algoritma yang memiliki cara kerja tersebut adalah ...", opt: ["Bubble Sort", "Selection Sort", "Insertion Sort", "Searching"], ans: 2 },
+        { q: "Algoritma yang bekerja dengan mencari nilai terkecil dari bagian data yang belum terurut kemudian menempatkannya pada posisi yang sesuai adalah ...", opt: ["Insertion Sort", "Selection Sort", "Bubble Sort", "Linear Search"], ans: 1 },
+        { q: "Pada Bubble Sort, data yang dibandingkan pada setiap proses utama adalah ...", opt: ["Dua data yang bersebelahan", "Data pertama dan data terakhir saja", "Semua data sekaligus", "Data terkecil dan terbesar saja"], ans: 0 },
+        { q: "Contoh kegiatan sehari-hari yang paling mendekati cara kerja Insertion Sort adalah ...", opt: ["Memilih siswa dengan nilai paling kecil kemudian menempatkannya di depan", "Membandingkan dua orang yang berdampingan dan menukar posisi jika urutannya salah", "Memasukkan kartu baru ke posisi yang tepat pada kartu yang sudah tersusun di tangan", "Mengambil semua kartu kemudian mengacaknya kembali"], ans: 2 },
+        { q: "Perhatikan data: 8 | 3 | 6 | 1 | 5. \nSeorang siswa mengatakan: 'Saya akan mengambil angka yang belum berada pada tempatnya, lalu memasukkannya ke posisi yang sesuai pada bagian data yang sudah terurut.' Algoritma yang sedang digunakan siswa tersebut adalah ...", opt: ["Bubble Sort", "Selection Sort", "Insertion Sort", "Searching"], ans: 2 },
+        { q: "Manakah pernyataan yang paling tepat menggambarkan Insertion Sort?", opt: ["Mencari nilai terkecil pada seluruh data lalu menukarnya ke depan", "Membandingkan pasangan data yang bersebelahan secara berulang", "Memasukkan data ke posisi yang tepat pada bagian yang telah terurut", "Membagi data menjadi dua bagian untuk mencari nilai"], ans: 2 },
+        { q: "Ciri utama Selection Sort adalah ...", opt: ["Data dibandingkan dari pasangan yang bersebelahan", "Nilai yang sesuai dipilih dari bagian yang belum terurut", "Data baru dimasukkan ke bagian yang sudah terurut", "Data selalu bergerak dari kanan ke kiri"], ans: 1 },
+        { q: "Perhatikan proses berikut: \n8 dan 3 → tukar\n8 dan 6 → tukar\n8 dan 1 → tukar\n8 dan 5 → tukar\nProses tersebut merupakan ciri dari ...", opt: ["Insertion Sort", "Selection Sort", "Bubble Sort", "Binary Search"], ans: 2 },
+        { q: "Perhatikan dua proses berikut.\nProses A: mencari nilai terkecil dari bagian data yang belum terurut.\nProses B: membandingkan data yang bersebelahan dan menukarnya jika urutannya salah.\nKesimpulan yang tepat adalah ...", opt: ["Proses A = Bubble Sort dan Proses B = Selection Sort", "Proses A = Selection Sort dan Proses B = Bubble Sort", "Proses A = Insertion Sort dan Proses B = Selection Sort", "Proses A = Bubble Sort dan Proses B = Insertion Sort"], ans: 1 },
+        { q: "Algoritma X: membandingkan data bersebelahan; data terbesar bergerak ke kanan.\nAlgoritma Y: mencari nilai terkecil dari data yang belum terurut; nilai tersebut ditempatkan pada posisi depan.\nPerbedaan utama X dan Y adalah ...", opt: ["X = Insertion Sort, Y = Bubble Sort", "X = Bubble Sort, Y = Selection Sort", "X = Selection Sort, Y = Insertion Sort", "X = Insertion Sort, Y = Selection Sort"], ans: 1 },
+        { q: "Gunakan Insertion Sort untuk mengurutkan: 8 | 3 | 6 | 1 | 5. Setelah angka 3 dimasukkan ke posisi yang tepat, data menjadi ...", opt: ["8 | 3 | 6 | 1 | 5", "3 | 8 | 6 | 1 | 5", "8 | 6 | 3 | 1 | 5", "3 | 6 | 8 | 1 | 5"], ans: 1 },
+        { q: "Gunakan Selection Sort pada data: 8 | 3 | 6 | 1 | 5. Nilai terkecil adalah 1. Setelah nilai tersebut ditempatkan pada posisi pertama, kondisi data menjadi ...", opt: ["1 | 3 | 6 | 8 | 5", "3 | 8 | 6 | 1 | 5", "1 | 8 | 3 | 6 | 5", "8 | 3 | 6 | 5 | 1"], ans: 0 },
+        { q: "Perhatikan kondisi data setelah Bubble Sort putaran pertama dari data awal: 8 | 3 | 6 | 1 | 5. Setelah perbandingan dilakukan dari kiri ke kanan, kondisi data yang benar adalah ...", opt: ["1 | 3 | 5 | 6 | 8", "3 | 6 | 1 | 5 | 8", "3 | 1 | 6 | 5 | 8", "8 | 3 | 6 | 1 | 5"], ans: 1 },
+        { q: "Kondisi: 3 | 1 | 5 | 6 | 8 merupakan hasil dari proses Bubble Sort pada data 8 | 3 | 6 | 1 | 5. Jika proses dilanjutkan, langkah berikutnya yang paling tepat adalah ...", opt: ["Membandingkan 3 dan 1, kemudian menukarnya", "Mencari nilai terkecil dari seluruh data", "Memindahkan angka 8 ke depan", "Mengambil angka 5 dan memasukkannya di antara 3 dan 6"], ans: 0 },
+        { q: "Seorang siswa mencari angka terkecil dari data yang belum tersusun, lalu menempatkannya pada posisi paling depan dari bagian yang belum tersusun. Algoritma yang digunakan dan alasan yang tepat adalah ...", opt: ["Bubble Sort, karena membandingkan angka yang bersebelahan", "Insertion Sort, karena memasukkan data ke posisi yang tepat", "Selection Sort, karena memilih nilai terkecil dari bagian yang belum terurut", "Searching, karena mencari angka tertentu"], ans: 2 }
+    ];
+
+    const avatars = ["🦊", "🐱", "🐶", "🐼", "🐨", "🦁", "🐯", "🐸", "🐙", "🐧", "🦖", "🦄", "🐵", "🐥"];
+    let players = JSON.parse(localStorage.getItem('sortingRaceData')) || {};
+    let myId = sessionStorage.getItem('sortingRaceMyId') || null;
+    let currentDice = 0;
+    let onResultClosed = null;
+    let currentActiveQuestionIndex = null;
+    let pendingGuruAction = null;
+    
+    let timerData = JSON.parse(localStorage.getItem('sortingRaceTimerData')) || { remaining: 900, isRunning: false, endTime: 0 };
+    let timerInterval = null;
+
+    let isMusicPlaying = false;
+    let bgmSynth = new Tone.Synth({ oscillator: { type: "square" }, envelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.1 } }).toDestination();
+    let sfxSynth = new Tone.Synth({ oscillator: { type: "triangle" }, envelope: { attack: 0.01, decay: 0.1, sustain: 0, release: 0.1 } }).toDestination();
+    let melody = new Tone.Sequence((time, note) => { bgmSynth.triggerAttackRelease(note, "16n", time); }, ["C4", "Eb4", "G4", "Bb4", "C5", "Bb4", "G4", "Eb4"], "8n");
+
+    const ladders = { 2: 38, 21: 42, 33: 68, 51: 89, 71: 91 };
+    const snakes = { 24: 7, 58: 36, 73: 47, 85: 64, 98: 79 };
+
+    function getCellCoord(cellNum) {
+        let zeroIndex = cellNum - 1; 
+        let rowFromBottom = Math.floor(zeroIndex / 10); 
+        let rem = zeroIndex % 10; 
+        let col = (rowFromBottom % 2 === 0) ? rem : (9 - rem);
+        let rowFromTop = 9 - rowFromBottom;
+        return { x: (col * 10) + 5, y: (rowFromTop * 10) + 5 };
+    }
+
+    function createBoard() {
+        const board = document.getElementById('board');
+        let html = '';
+        for (let row = 0; row < 10; row++) {
+            for (let col = 0; col < 10; col++) {
+                let cellNum = (row % 2 === 0) ? (100 - (row * 10) - col) : (100 - (row * 10) - (9 - col));
+                let labelText = (cellNum === 100) ? "Finish 100" : (cellNum === 1) ? "Start 1" : cellNum;
+                html += `<div class="cell" id="cell-${cellNum}">${labelText}</div>`;
+            }
+        }
+        board.innerHTML = html;
+        drawSnakesAndLadders();
+        
+        if (myId && players[myId]) {
+            document.getElementById('join-section').style.display = 'none';
+            document.getElementById('play-section').style.display = 'block';
+            document.getElementById('my-name').innerText = players[myId].name.toUpperCase();
+            document.getElementById('my-avatar').innerText = players[myId].ava;
+            document.getElementById('current-pos').innerText = players[myId].pos;
+        }
+        updateBoard();
+    }
+
+    function drawSnakesAndLadders() {
+        const svg = document.getElementById('svg-layer');
+        let svgContent = '';
+        const snakeColors = ['#9b59b6', '#f1c40f', '#2ecc71', '#e84118', '#0984e3'];
+
+        for (const [start, end] of Object.entries(ladders)) {
+            const p1 = getCellCoord(start); const p2 = getCellCoord(end);
+            svgContent += `<line x1="${p1.x-1.5}" y1="${p1.y}" x2="${p2.x-1.5}" y2="${p2.y}" stroke="#1e272e" stroke-width="1.5" />`;
+            svgContent += `<line x1="${p1.x+1.5}" y1="${p1.y}" x2="${p2.x+1.5}" y2="${p2.y}" stroke="#1e272e" stroke-width="1.5" />`;
+            svgContent += `<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="#1e272e" stroke-width="3" stroke-dasharray="1.5,2.5" />`;
+        }
+        
+        let sIdx = 0;
+        for (const [start, end] of Object.entries(snakes)) {
+            const p1 = getCellCoord(start); const p2 = getCellCoord(end);
+            let midX = (p1.x + p2.x) / 2 + (sIdx%2===0?7:-7); let midY = (p1.y + p2.y) / 2;
+            let mainColor = snakeColors[sIdx % snakeColors.length];
+            svgContent += `<path d="M ${p1.x} ${p1.y} Q ${midX} ${midY} ${p2.x} ${p2.y}" fill="transparent" stroke="#1e272e" stroke-width="4.5" stroke-linecap="round"/>`;
+            svgContent += `<path d="M ${p1.x} ${p1.y} Q ${midX} ${midY} ${p2.x} ${p2.y}" fill="transparent" stroke="${mainColor}" stroke-width="3" stroke-linecap="round"/>`;
+            svgContent += `<path d="M ${p1.x} ${p1.y} Q ${midX} ${midY} ${p2.x} ${p2.y}" fill="transparent" stroke="#ffffff" stroke-width="1" stroke-dasharray="1,1.5" />`;
+            svgContent += `<circle cx="${p1.x}" cy="${p1.y}" r="2" fill="${mainColor}" stroke="#1e272e" stroke-width="0.5"/>`;
+            svgContent += `<circle cx="${p1.x-0.5}" cy="${p1.y-0.5}" r="0.4" fill="white" />`; 
+            svgContent += `<circle cx="${p1.x+0.5}" cy="${p1.y-0.5}" r="0.4" fill="white" />`;
+            sIdx++;
+        }
+        svg.innerHTML = svgContent;
+    }
+
+    function askPinForAction(actionType) {
+        pendingGuruAction = actionType;
+        document.getElementById('guru-pin-input').value = '';
+        document.getElementById('pin-modal').style.display = 'flex';
+        document.getElementById('guru-pin-input').focus();
+    }
+
+    function closePinModal() {
+        document.getElementById('pin-modal').style.display = 'none';
+        pendingGuruAction = null;
+    }
+
+    function verifyGuruPin() {
+        let enteredPin = document.getElementById('guru-pin-input').value;
+        if (enteredPin === "0000") {
+            let actionToExecute = pendingGuruAction;
+            closePinModal(); 
+            executeGuruAction(actionToExecute);
+        } else {
+            let modalBox = document.querySelector('#pin-modal .modal-content');
+            modalBox.classList.add('shake-anim');
+            setTimeout(() => modalBox.classList.remove('shake-anim'), 400);
+            document.getElementById('guru-pin-input').value = '';
+        }
+    }
+
+    function executeGuruAction(action) {
+        if (!action) return;
+        
+        if (action === 'timer_start') {
+            if (timerData.isRunning || timerData.remaining <= 0) return;
+            timerData.isRunning = true;
+            timerData.endTime = Date.now() + (timerData.remaining * 1000);
+            saveTimerState(); runTimerLoop();
+        } else if (action === 'timer_pause') {
+            if (!timerData.isRunning) return;
+            timerData.isRunning = false;
+            timerData.remaining = Math.max(0, (timerData.endTime - Date.now()) / 1000);
+            saveTimerState(); clearInterval(timerInterval); renderTimer();
+        } else if (action === 'timer_reset') {
+            timerData.isRunning = false; timerData.remaining = 900; timerData.endTime = 0;
+            saveTimerState(); clearInterval(timerInterval); renderTimer();
+        } else if (action === 'download_csv') {
+            let d = new Date();
+            let dStr = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
+            
+            let csv = "Nama,Karakter,Status,Posisi,Soal Benar,Dadu Hangus (Salah),Giliran Total,Skor Akurasi,Waktu Mulai,Waktu Selesai,Total Waktu (Detik)\n";
+            
+            Object.values(players).forEach(p => { 
+                let status = p.isFinish ? 'SELESAI' : 'BERMAIN';
+                let totalGiliran = p.answered + p.wrong;
+                let akurasi = totalGiliran > 0 ? Math.round((p.answered / totalGiliran) * 100) : 0;
+                let wMulai = p.startTime || '-';
+                let wSelesai = p.finishTime || '-';
+                let duration = '-';
+                if(p.startTime && p.finishTime){
+                   let [sh, sm, ss] = p.startTime.split(':');
+                   let [eh, em, es] = p.finishTime.split(':');
+                   let sDate = new Date(); sDate.setHours(sh, sm, ss);
+                   let eDate = new Date(); eDate.setHours(eh, em, es);
+                   duration = Math.round((eDate - sDate)/1000);
+                }
+                csv += `${p.name},${p.ava},${status},${p.pos},${p.answered},${p.wrong},${totalGiliran},${akurasi},${wMulai},${wSelesai},${duration}\n`; 
+            });
+            
+            let blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' }); 
+            let url = window.URL.createObjectURL(blob);
+            let a = document.createElement('a'); a.href = url; a.download = `Hasil_UlarTangga_Sorting_${dStr}.csv`; a.click();
+        } else if (action === 'delete_data') {
+            if(confirm("Yakin ingin menghapus seluruh jejak pemain? (Aksi ini tidak bisa dibatalkan)")) {
+                localStorage.clear(); sessionStorage.clear(); location.reload();
+            }
+        }
+    }
+
+    function renderTimer() {
+        let m = Math.floor(timerData.remaining / 60);
+        let s = Math.floor(timerData.remaining % 60);
+        document.getElementById('timer-display').innerHTML = `<span style="font-size:12px;">⏱</span> ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        
+        if (timerData.isRunning && timerData.remaining > 0) {
+            unlockDice();
+        } else {
+            lockDice();
+        }
+    }
+
+    function saveTimerState() { localStorage.setItem('sortingRaceTimerData', JSON.stringify(timerData)); }
+
+    function runTimerLoop() {
+        clearInterval(timerInterval);
+        if (!timerData.isRunning) return;
+        timerInterval = setInterval(() => {
+            let dist = (timerData.endTime - Date.now()) / 1000;
+            if (dist <= 0) {
+                clearInterval(timerInterval); timerData.remaining = 0; timerData.isRunning = false; renderTimer(); 
+            } else {
+                timerData.remaining = dist; renderTimer();
+            }
+        }, 1000);
+    }
+
+    function lockDice() {
+        let rollBtn = document.getElementById('btn-roll');
+        if (rollBtn) {
+            rollBtn.disabled = true;
+            rollBtn.style.background = "#e74c3c"; rollBtn.style.color = "white";
+            if (timerData.remaining <= 0) rollBtn.innerHTML = "WAKTU<br>HABIS";
+            else rollBtn.innerHTML = "TUNGGU<br>GURU";
+        }
+    }
+
+    function unlockDice() {
+        let rollBtn = document.getElementById('btn-roll');
+        if (rollBtn && myId && players[myId] && !players[myId].isFinish) {
+            rollBtn.disabled = false; 
+            rollBtn.style.background = "#2ecc71"; rollBtn.style.color = "var(--border-dark)";
+            rollBtn.innerHTML = "LEMPAR<br>DADU";
+        }
+    }
+
+    function showCustomResult(icon, title, desc, btnColor, isShake, callbackParam) {
+        document.getElementById('result-icon').innerText = icon;
+        document.getElementById('result-title').innerText = title;
+        document.getElementById('result-title').style.color = (btnColor === 'var(--btn-red)') ? '#e84118' : '#2c3e50';
+        document.getElementById('result-desc').innerHTML = desc;
+        
+        const btn = document.getElementById('btn-result-close');
+        btn.style.backgroundColor = (btnColor === 'var(--btn-yellow)') ? 'var(--btn-yellow)' : btnColor;
+        btn.style.color = (btnColor === 'var(--btn-yellow)') ? 'var(--border-dark)' : 'white';
+        
+        let box = document.getElementById('result-box-content');
+        if(isShake) { box.classList.add('shake-anim'); setTimeout(() => box.classList.remove('shake-anim'), 500); }
+        
+        document.getElementById('result-modal').style.display = 'flex';
+        
+        onResultClosed = callbackParam;
+    }
+
+    function closeResultModal() {
+        document.getElementById('result-modal').style.display = 'none';
+        if (onResultClosed) {
+            let callback = onResultClosed;
+            onResultClosed = null;
+            callback();
+        }
+    }
+
+    function joinGame() {
+        const name = document.getElementById('player-name').value.trim();
+        if (!name) return showCustomResult("⚠️", "HEI!", "Ketik namamu dulu sebelum bermain.", "var(--btn-red)", true, null);
+        
+        myId = 'player_' + Math.random().toString(36).substr(2, 9);
+        let myAva = avatars[Math.floor(Math.random() * avatars.length)];
+        let unansweredArr = Array.from({length: bankSoal.length}, (_, i) => i);
+        
+        let now = new Date();
+        let joinTime = String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0') + ":" + String(now.getSeconds()).padStart(2, '0');
+
+        players[myId] = {
+            name: name, pos: 1, answered: 0, ava: myAva,
+            isFinish: false, correct: 0, wrong: 0, unanswered: unansweredArr,
+            startTime: joinTime, finishTime: null
+        };
+        
+        sessionStorage.setItem('sortingRaceMyId', myId); saveGameState();
+        
+        document.getElementById('join-section').style.display = 'none';
+        document.getElementById('play-section').style.display = 'block';
+        document.getElementById('my-name').innerText = name.toUpperCase();
+        document.getElementById('my-avatar').innerText = myAva;
+        
+        updateBoard(); renderTimer(); 
+    }
+
+    function playDiceSound() {
+        if (!isMusicPlaying) return;
+        let now = Tone.now();
+        sfxSynth.triggerAttackRelease("C4", "32n", now);
+        sfxSynth.triggerAttackRelease("E4", "32n", now + 0.15);
+        sfxSynth.triggerAttackRelease("G4", "32n", now + 0.3);
+        sfxSynth.triggerAttackRelease("C5", "32n", now + 0.45);
+        sfxSynth.triggerAttackRelease("G5", "16n", now + 0.7);
+    }
+
+    function rollDice() {
+        if (!myId || !players[myId]) return;
+        
+        if(players[myId].isFinish) {
+            return showCustomResult("🏆", "SELESAI", "Kamu sudah mencapai garis Finish!", "var(--btn-yellow)", false, null);
+        }
+        
+        let rollBtn = document.getElementById('btn-roll');
+        rollBtn.disabled = true;
+        
+        const diceIcon = document.getElementById('dice-result');
+        diceIcon.classList.add('rolling-dice');
+        playDiceSound();
+
+        let rollInterval = setInterval(() => {
+            diceIcon.innerText = Math.floor(Math.random() * 6) + 1;
+        }, 50);
+
+        setTimeout(() => {
+            clearInterval(rollInterval);
+            diceIcon.classList.remove('rolling-dice');
+            currentDice = Math.floor(Math.random() * 6) + 1;
+            diceIcon.innerText = currentDice;
+            setTimeout(showQuestion, 600);
+        }, 800);
+    }
+
+    function showQuestion() {
+        let p = players[myId];
+        let availableQ = p.unanswered;
+        if(availableQ.length === 0) availableQ = [0]; 
+
+        let randomIdx = Math.floor(Math.random() * availableQ.length);
+        currentActiveQuestionIndex = availableQ[randomIdx];
+        const qData = bankSoal[currentActiveQuestionIndex];
+        
+        document.getElementById('q-text').innerText = qData.q;
+        let optHtml = '';
+        qData.opt.forEach((opt, idx) => {
+            optHtml += `<button class="option-btn" onclick="checkAnswer(${idx}, ${qData.ans})">${opt}</button>`;
+        });
+        document.getElementById('q-options').innerHTML = optHtml;
+        document.getElementById('question-modal').style.display = 'flex';
+    }
+
+    function checkAnswer(selected, correct) {
+        document.getElementById('question-modal').style.display = 'none';
+        let p = players[myId];
+        
+        if (selected === correct) {
+            p.unanswered = p.unanswered.filter(idx => idx !== currentActiveQuestionIndex);
+            p.answered++; p.correct++;
+            
+            if (isMusicPlaying) {
+                let now = Tone.now();
+                sfxSynth.triggerAttackRelease("C5", "16n", now);
+                sfxSynth.triggerAttackRelease("E5", "16n", now + 0.1);
+                sfxSynth.triggerAttackRelease("G5", "8n", now + 0.2);
+            }
+            
+            let msg = `Kamu melangkah maju <b>${currentDice}</b> kotak.`;
+            let newPos = p.pos + currentDice;
+            let finalTitle = "JAWABAN TEPAT!"; let icon = "🎯"; let btnColor = "var(--btn-green)";
+
+            if (newPos >= 100) {
+                if (p.answered >= 15) {
+                    p.pos = 100; p.isFinish = true;
+                    let now = new Date();
+                    p.finishTime = String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0') + ":" + String(now.getSeconds()).padStart(2, '0');
+                    msg = `✨ SELAMAT! KAMU MENYELESAIKAN 15 MISI DAN FINISH! ✨`;
+                    finalTitle = "LUAR BIASA!"; icon = "🏆";
+                } else {
+                    p.pos = 99; 
+                    msg = `Posisi mentok di 99!<br>Masih ada soal yang belum lunas. Terus berjuang!`;
+                    icon = "🔒"; btnColor = "var(--btn-yellow)";
+                }
+            } else {
+                p.pos = newPos;
+                if (ladders[p.pos]) {
+                    msg += `<br><br>🚀 WOOSH! Kamu mendarat di tangga dan naik!`; p.pos = ladders[p.pos]; icon = "🚀";
+                } else if (snakes[p.pos]) {
+                    msg += `<br><br>🐍 ADUH! Digigit Ular, kamu meluncur turun!`; p.pos = snakes[p.pos]; icon = "🐍"; btnColor = "var(--btn-red)";
+                }
+            }
+            
+            let executeAfterClose = () => { 
+                document.getElementById('current-pos').innerText = p.pos; 
+                saveGameState(); 
+                updateBoard(); 
+                renderTimer(); 
+            };
+            
+            showCustomResult(icon, finalTitle, msg, btnColor, false, executeAfterClose);
+
+        } else {
+            p.wrong++;
+            if (navigator.vibrate) navigator.vibrate(400);
+            
+            if (isMusicPlaying) {
+                let now = Tone.now();
+                sfxSynth.triggerAttackRelease("E3", "8n", now);
+                sfxSynth.triggerAttackRelease("C3", "4n", now + 0.2);
+            }
+            
+            let executeAfterClose = () => { 
+                saveGameState(); 
+                updateBoard(); 
+                renderTimer(); 
+            };
+            
+            showCustomResult("❌", "YAH SALAH!", "Cara kerja algoritma kurang tepat.<br>Dadu hangus, kamu tidak bergerak giliran ini.", "var(--btn-red)", true, executeAfterClose);
+        }
+    }
+
+    // --- LOGIKA PENYEBARAN PION BERTUMPUK (RADIAL OFFSET) ---
+    function updateBoard() {
+        document.querySelectorAll('.player-token').forEach(t => t.remove());
+        // Bersihkan tooltip lama dari kotak
+        document.querySelectorAll('.cell-tooltip').forEach(t => t.remove());
+        
+        const lbList = document.getElementById('lb-list');
+        lbList.innerHTML = '';
+        
+        // Kelompokkan pemain berdasarkan posisi kotak
+        let playersByPos = {};
+        let sortedPlayers = Object.values(players).sort((a, b) => b.pos - a.pos);
+
+        sortedPlayers.forEach(p => {
+            if (!playersByPos[p.pos]) playersByPos[p.pos] = [];
+            playersByPos[p.pos].push(p);
+        });
+
+        // Gambar pion dan atur offset jika bertumpuk
+        for (let pos in playersByPos) {
+            let group = playersByPos[pos];
+            let cellCoord = getCellCoord(pos);
+            let totalInCell = group.length;
+
+            group.forEach((p, i) => {
+                const token = document.createElement('div');
+                token.className = 'player-token';
+                token.innerText = p.ava;
+
+                let offsetX = 0; let offsetY = 0;
+                
+                // Jika lebih dari 1 orang di kotak yang sama, sebar melingkar
+                if (totalInCell > 1) {
+                    let angle = (i / totalInCell) * (2 * Math.PI);
+                    // Radius sebaran 3% dari ukuran cell (bisa disesuaikan)
+                    let radius = 2.5; 
+                    offsetX = Math.cos(angle) * radius;
+                    offsetY = Math.sin(angle) * radius;
+                    
+                    // Supaya yang menumpuk ukurannya sedikit lebih kecil agar muat
+                    token.style.transform = `translate(-50%, -50%) scale(0.85)`;
+                }
+
+                token.style.left = (cellCoord.x + offsetX) + '%'; 
+                token.style.top = (cellCoord.y + offsetY) + '%';
+                document.getElementById('board-wrapper').appendChild(token);
+            });
+
+            // --- TOOLTIP KOTAK (BATAS MAKS 3 NAMA) ---
+            if (pos > 0) {
+                let cellId = (pos % 10 === 0 && Math.floor((pos-1)/10) % 2 !== 0) ? pos : pos; // mencari id cell HTML
+                let cellElem = document.getElementById(`cell-${pos}`);
+                if(cellElem) {
+                    let tooltip = document.createElement('div');
+                    tooltip.className = 'cell-tooltip';
+                    
+                    let namesToShow = group.slice(0, 3).map(p => p.name.toUpperCase()).join('<br>');
+                    if (totalInCell > 3) {
+                        namesToShow += `<br><span style="color:#f1c40f;">+ ${totalInCell - 3} lainnya</span>`;
+                    }
+                    
+                    tooltip.innerHTML = namesToShow;
+                    cellElem.appendChild(tooltip);
+                }
+            }
+        }
+
+        // Render Klasemen
+        sortedPlayers.forEach((p, idx) => {
+            lbList.innerHTML += `
+                <div class="lb-item">
+                    <span class="lb-rank">${idx + 1}.</span>
+                    <div style="font-size:24px;">${p.ava}</div>
+                    <div style="flex-grow:1;">
+                        <h4 class="pixel-text">${p.name} ${p.isFinish ? '🏁' : ''}</h4>
+                        <p>📍 Posisi: ${p.pos}/100</p>
+                    </div>
+                </div>
+            `;
+        });
+        document.getElementById('player-count-num').innerText = `${Object.keys(players).length}/44`;
+    }
+
+    function saveGameState() { localStorage.setItem('sortingRaceData', JSON.stringify(players)); }
+    
+    // Sinkronisasi Multi-Tab
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'sortingRaceData') { players = JSON.parse(e.newValue) || {}; updateBoard(); }
+        if (e.key === 'sortingRaceTimerData') {
+            let newData = JSON.parse(e.newValue);
+            if (newData) {
+                let wasRunning = timerData.isRunning; timerData = newData;
+                if (timerData.isRunning && !wasRunning) runTimerLoop();
+                else if (!timerData.isRunning) { clearInterval(timerInterval); renderTimer(); }
+            }
+        }
+    });
+
+    document.getElementById('btn-music').addEventListener('click', async () => {
+        if (!isMusicPlaying) {
+            await Tone.start(); Tone.Transport.bpm.value = 160; melody.start(0); Tone.Transport.start();
+            document.getElementById('btn-music').innerHTML = "🔊 Musik<br><br>ON"; isMusicPlaying = true;
+        } else {
+            melody.stop(); Tone.Transport.stop();
+            document.getElementById('btn-music').innerHTML = "🔊 Musik<br><br>OFF"; isMusicPlaying = false;
+        }
+    });
+
+    document.getElementById("guru-pin-input").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault(); verifyGuruPin();
+        }
+    });
+
+    window.onload = () => { createBoard(); renderTimer(); if (timerData.isRunning) runTimerLoop(); };
+</script>
+</body>
+</html>
