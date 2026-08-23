@@ -28,16 +28,12 @@
         .game-title {
             text-align: center; margin: 5px 0 10px 0;
             font-size: clamp(18px, 2.5vw, 28px); letter-spacing: 3px;
-            
-            /* Animasi Warna & Bayangan */
             background: linear-gradient(90deg, #e74c3c, #f1c40f, #2ecc71, #3498db, #9b59b6, #e74c3c);
             background-size: 200% auto;
             color: transparent;
             -webkit-background-clip: text;
             background-clip: text;
             text-shadow: 3px 3px 0px rgba(30,39,46,0.2);
-            
-            /* Animasi Gerak */
             animation: shine 4s linear infinite, floatTitle 3s ease-in-out infinite;
         }
         @keyframes shine { to { background-position: 200% center; } }
@@ -57,7 +53,7 @@
             gap: 20px; min-width: 0;
         }
         
-        /* --- TOP BAR (RENTANG PENUH KIRI KE KANAN) --- */
+        /* --- TOP BAR --- */
         .top-bar {
             width: 100%; display: flex; justify-content: space-between; align-items: center; 
             background: white; padding: 15px 25px; border-radius: 12px;
@@ -89,7 +85,6 @@
             font-size: 13px; font-weight: 900; color: #57606f; white-space: nowrap; border: 2px solid #dfe4ea;
         }
 
-        /* Group Aksi Guru (Satu Baris) */
         .guru-actions { display: flex; gap: 12px; align-items: center; }
         
         .btn-guru-inline {
@@ -161,7 +156,6 @@
             border-radius: 8px; font-size: 15px; font-weight: bold; font-family: inherit; outline: none;
         }
 
-        /* --- KLASEMEN & PAPAN --- */
         .leaderboard-header {
             background: var(--border-dark); color: white; text-align: center;
             padding: 15px; font-size: 13px; border-radius: 6px; margin-bottom: 20px; letter-spacing: 1px;
@@ -175,15 +169,15 @@
         .lb-item p { margin: 0; font-size: 12px; color: #2980b9; font-weight: bold; }
         .lb-rank { font-size: 14px; color: #7f8c8d; font-weight: bold; width: 25px;}
 
-        /* PERBAIKAN PAPAN AGAR LEBIH BESAR SEJAJAR DENGAN TOP BAR */
+        /* PERBAIKAN UKURAN PAPAN AGAR KOTAK SEMPURNA (1:1) */
         #board-wrapper {
             position: relative; 
-            width: 100%; /* Memaksa papan selebar top bar */
-            height: auto; 
-            aspect-ratio: 1 / 1; 
-            max-height: calc(100vh - 180px); /* Menjaga agar tidak terpotong bagian bawah layar */
+            width: 100%; 
+            max-width: calc(100vh - 170px); /* Batas lebar disesuaikan dengan tinggi layar */
+            aspect-ratio: 1 / 1; /* Memaksa bentuk bujur sangkar */
             border: 8px solid var(--border-dark); border-radius: 8px;
-            box-shadow: 8px 8px 0px rgba(0,0,0,0.15); background: white; margin: 0 auto;
+            box-shadow: 8px 8px 0px rgba(0,0,0,0.15); background: white; 
+            margin: 0 auto; /* Rata tengah */
         }
         #board {
             width: 100%; height: 100%; display: grid; 
@@ -254,10 +248,15 @@
         @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         @keyframes shakeAlert {
             0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
             20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
             40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
             60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
             80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
             100% { transform: translate(1px, -2px) rotate(-1deg); }
         }
         .shake-anim { animation: shakeAlert 0.4s !important; }
@@ -296,7 +295,6 @@
                 <span class="badge">Pemain: <b id="player-count-num" style="color:#0984e3; font-size:16px;">0/44</b></span>
             </div>
 
-            <!-- TOMBOL GURU SEBARIS (INLINE) -->
             <div class="guru-actions">
                 <button id="btn-music" class="btn-guru-inline bg-yellow pixel-text">🔊 Musik ON</button>
                 <button onclick="askPinForAction('download_csv')" class="btn-guru-inline bg-purple pixel-text">📥 Unduh CSV</button>
@@ -555,8 +553,11 @@
         let s = Math.floor(timerData.remaining % 60);
         document.getElementById('timer-display').innerHTML = `<span style="font-size:12px;">⏱</span> ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
         
-        if (timerData.isRunning && timerData.remaining > 0) unlockDice();
-        else lockDice();
+        if (timerData.isRunning && timerData.remaining > 0) {
+            unlockDice();
+        } else {
+            lockDice();
+        }
     }
 
     function saveTimerState() { localStorage.setItem('sortingRaceTimerData', JSON.stringify(timerData)); }
